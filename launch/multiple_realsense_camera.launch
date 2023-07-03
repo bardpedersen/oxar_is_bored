@@ -1,0 +1,14 @@
+<launch>
+
+    <arg name="video_device0" default="0"/>
+    <arg name="video_device1" default="2"/>
+    <arg name="video_device2" default="4"/>
+
+    <!--Include realsense2_camera launch from different ports-->
+    <include file="$(find realsense2_camera)/launch/rs_multiple_devices.launch">
+        <param name="serial_no_camera1" value="$(arg video_device0)" />
+        <param name="serial_no_camera2" value="$(arg video_device1)" />
+        <param name="serial_no_camera3" value="$(arg video_device2)" />
+    </include>
+
+</launch>

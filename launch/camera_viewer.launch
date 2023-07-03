@@ -1,0 +1,20 @@
+<launch>
+    <!--Input value is camera topic-->
+    <arg name="camera1" default="/usb_cam_0/image_raw" />
+    <arg name="camera2" default="/usb_cam_12/image_raw" />
+    <arg name="camera3" default="/usb_cam_4/image_raw" />
+    <arg name="camera4" default="/camera/color/image_raw" />
+
+    <arg name="camera_topics" default='["$(arg camera1)","$(arg camera2)","$(arg camera4)"]' />
+    
+    <!--Starting camera_viewer node-->
+    <node pkg="video_visualizer" type="camera_viewer.py" name="camera_viewer" output="screen">
+        <rosparam param="camera_topics" subst_value="True">$(arg camera_topics)</rosparam>
+    </node>
+
+
+    <!--Lauch controller launch-->
+    <include file="$(find video_visualizer)/launch/controller_launch.launch" />
+    
+
+</launch>
