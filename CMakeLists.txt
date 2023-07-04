@@ -129,6 +129,9 @@ include_directories(
 #   src/${PROJECT_NAME}/video_visualizer.cpp
 # )
 
+add_executable(simple_servo_node src/simple_servo_node.cpp)
+target_link_libraries(simple_servo_node ${catkin_LIBRARIES})
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
