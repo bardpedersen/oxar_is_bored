@@ -1,0 +1,18 @@
+<launch>
+
+  <arg name="joy_dev" default="/dev/input/js1" />
+  <arg name="joy_autorepeat_rate" default="20" />
+  <arg name="joy_deadzone" default="0.0" />
+
+  <node pkg="joy" type="joy_node" name="joy_node">
+    <param name="dev" value="$(arg joy_dev)" />
+    <param name="deadzone" value="$(arg joy_deadzone)" />
+    <param name="autorepeat_rate" value="$(arg joy_autorepeat_rate)" />
+  </node>
+
+  <node pkg="video_visualizer" type="teleop_node_py.py" name="teleop_node" output="screen">
+    <remap from="home_steering" to="base_driver/home_steering" />
+    <remap from="safety_stop" to="base_driver/safety_stop" />
+  </node>
+
+</launch>
