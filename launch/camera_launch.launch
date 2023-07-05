@@ -1,7 +1,7 @@
 <launch>
 
    <!-- video source -->
-   <arg name="video_device" default="2"/>
+   <arg name="video_device" default="0"/>
    <arg name="save_bag" default="false"/>
 
    <!-- launch usb cam -->
