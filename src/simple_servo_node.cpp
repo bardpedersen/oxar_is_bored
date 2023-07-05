@@ -12,7 +12,14 @@ int getch()
     newt = oldt;
     newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
     ch = getchar();
+
+    if (ch == 27 && getchar() == 91)  // Check for escape sequence
+    {
+        ch = getchar();
+    }
+
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     return ch;
 }
@@ -25,40 +32,36 @@ int main(int argc, char** argv)
 
     std_msgs::Int32MultiArray joint_angles;
     joint_angles.data.resize(2);
-    joint_angles.data[0] = 0;
-    joint_angles.data[1] = 0;
+    joint_angles.data[0] = 90;
+    joint_angles.data[1] = 90;
 
-    std::cout << "Use 'q' and 'a' to increase/decrease the first int (0-180)." << std::endl;
-    std::cout << "Use 'w' and 's' to increase/decrease the second int (0-180)." << std::endl;
+    std::cout << "Use arrow keys to increase/decrease the joint angles (0-180)." << std::endl;
     std::cout << "Press 'x' to exit." << std::endl;
 
     while (ros::ok())
     {
         int c = getch();
 
-        if (c == 'q')
+        switch (c)
         {
-            if (joint_angles.data[0] < 180)
-                joint_angles.data[0]++;
-        }
-        else if (c == 'a')
-        {
-            if (joint_angles.data[0] > 0)
-                joint_angles.data[0]--;
-        }
-        else if (c == 'w')
-        {
-            if (joint_angles.data[1] < 180)
-                joint_angles.data[1]++;
-        }
-        else if (c == 's')
-        {
-            if (joint_angles.data[1] > 0)
-                joint_angles.data[1]--;
-        }
-        else if (c == 'x')
-        {
-            break;
+            case 65:  // Up arrow key
+                if (joint_angles.data[1] < 180)
+                    joint_angles.data[1]++;
+                break;
+            case 66:  // Down arrow key
+                if (joint_angles.data[1] > 0)
+                    joint_angles.data[1]--;
+                break;
+            case 67:  // Right arrow key
+                if (joint_angles.data[0] < 180)
+                    joint_angles.data[0]++;
+                break;
+            case 68:  // Left arrow key
+                if (joint_angles.data[0] > 0)
+                    joint_angles.data[0]--;
+                break;
+            case 'x':
+                return 0;
         }
 
         pub.publish(joint_angles);
