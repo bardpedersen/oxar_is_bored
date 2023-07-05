@@ -12,7 +12,7 @@ import rospy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
 from std_srvs.srv import Trigger, TriggerRequest
-from geometry_msgs.msg import Pose
+from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray
 
 class TeleopNode:
@@ -20,47 +20,55 @@ class TeleopNode:
 
         # Define the different buttons with their corresponding index
         # For axes, all between 1 and -1, with 0 as resting position
-        self.joystick_left_left_right = 0
-        self.joystick_left_up_down = 1
-        self.linear_L2 = 2
-        self.joystick_right_left_right = 3
-        self.joystick_right_up_down = 4
-        self.linear_R2 = 5
-        self.d_pad_left_right = 6
-        self.d_pad_up_down = 7
+        # Up = 1, down = -1
+        # Left = 1, right = -1
+        self.L_left_right = 0
+        self.L_up_down = 1
+        self.LT = 2
+        self.R_left_right = 3
+        self.R_up_down = 4
+        self.RT = 5
+        self.d_pad_left_right = 6 
+        self.d_pad_up_down = 7 
 
         # For buttons
-        self.cross = 0
-        self.circle = 1
-        self.triangle = 2
-        self.square = 3
-        self.L1 = 4
-        self.R1 = 5
-        self.share = 6
+        self.A = 0
+        self.B = 1
+        self.X = 2
+        self.Y = 3
+        self.LB = 4
+        self.RB = 5
+        self.back = 6
         self.start = 7
-        self.PS = 8
+        self.xbox = 8
         self.L3 = 9
         self.R3 = 10
 
 
         self.turning_buttons_initiated_ = False
+        self.arm1 = True
+        self.arm_list = []
 
 
         # For arm
-        self.position_x = 0.0
-        self.position_y = 0.0
-        self.position_z = 0.0
-        self.orientation_x = 0.0
-        self.orientation_y = 0.0
-        self.orientation_z = 0.0
-        self.orientation_w = 0.0
+        self.position_x_1 = 0.0
+        self.position_y_1 = 0.0
+        self.position_z_1 = 0.0
+        
+        self.position_x_2 = 0.0
+        self.position_y_2 = 0.0
+        self.position_z_2 = 0.0
 
         self.min_x_arm = 0
-        self.max_x_arm = 100
+        self.max_x_arm = 500
         self.min_y_arm = 0
-        self.max_y_arm = 100
+        self.max_y_arm = 500
         self.min_z_arm = 0
-        self.max_z_arm = 100
+        self.max_z_arm = 500
+
+        self.arm_speed_control = 1
+        self.arm_max_speed = 10
+        self.arm_min_speed = 0
 
         # For end effector
         self.end_effector_first = 90
@@ -85,7 +93,8 @@ class TeleopNode:
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 
         # Create a publisher for the arm_controller topic
-        self.arm_posit_pub = rospy.Publisher('/arm_1/arm_controller/position_command', Pose, queue_size=10)
+        self.arm_posit_pub1 = rospy.Publisher('/arm1position', JointState, queue_size=10)
+        self.arm_posit_pub2 = rospy.Publisher('/arm2position', JointState, queue_size=10)
 
         # Create a publisher for the end effector topic
         self.end_effector_pub = rospy.Publisher('/joint_angles', Int32MultiArray, queue_size=10)
@@ -140,65 +149,71 @@ class TeleopNode:
     def driving(self, data):
         # Create a Twist message and populate it with data from the Joy message
 
-        if data.buttons[self.R1] == 1:
+        # Adjust the speed of the robot
+        if data.buttons[self.RB] == 1:
             self.speed_controll += 0.1
             self.speed_controll = min(max(self.speed_controll, self.min_speed), self.max_speed)
         
-        if data.buttons[self.L1] == 1:
+        if data.buttons[self.LB] == 1:
             self.speed_controll -= 0.1
             self.speed_controll = min(max(self.speed_controll, self.min_speed), self.max_speed)
 
 
         twist = Twist()
-        twist.linear.x = data.axes[self.joystick_left_up_down] * self.speed_controll # Forward/backward motion (left joystick up/down)
-        twist.angular.z = data.axes[self.joystick_right_left_right] * self.speed_controll # Rotation (left joystick left/right)
+        twist.linear.x = data.axes[self.L_up_down] * self.speed_controll # Forward/backward motion (left joystick up/down)
+        twist.angular.z = data.axes[self.R_left_right] * self.speed_controll # Rotation (left joystick left/right)
 
         self.cmd_vel_pub.publish(twist)
 
 
     # Function for controlling the arms
-    def controll_arm(self, data):        
+    def controll_arm(self, data, pos_x, pos_y, pos_z, pub): 
+
+        if data.buttons[self.start] == 1:
+            self.arm_speed_control += 0.1
+            self.arm_speed_control = min(max(self.arm_speed_control, self.arm_min_speed), self.arm_max_speed)
+        
+        if data.buttons[self.back] == 1:
+            self.arm_speed_control -= 0.1
+            self.arm_speed_control = min(max(self.arm_speed_control, self.arm_min_speed), self.arm_max_speed)
+
 
         # Increasing the values within the limits, the d-pad
-        self.position_x += data.axes[self.d_pad_up_down]
-        self.position_x = min(max(self.position_x, self.min_x_arm), self.max_x_arm)
+        pos_x += data.axes[self.d_pad_up_down] * self.arm_speed_control
+        pos_x = min(max(pos_x, self.min_x_arm), self.max_x_arm)
 
-        self.position_y += data.axes[self.d_pad_left_right]
-        self.position_y = min(max(self.position_y, self.min_y_arm), self.max_y_arm)
+        pos_y += data.axes[self.d_pad_left_right] * self.arm_speed_control
+        pos_y = min(max(pos_y, self.min_y_arm), self.max_y_arm)
 
         # Check if the turning buttons are initiated
         # Uses the L2 and R2 buttons to control the z-axis linearly, more pressed bigger increment
         if self.turning_buttons_initiated_:
-            self.position_z += (1 - data.axes[self.linear_L2]) / 2
-            self.position_z -= (1 - data.axes[self.linear_R2]) / 2
-            self.position_z = min(max(self.position_z, self.min_z_arm), self.max_z_arm)
+            pos_z += (1 - data.axes[self.LT]) / 2 * self.arm_speed_control
+            pos_z -= (1 - data.axes[self.RT]) / 2 * self.arm_speed_control
+            pos_z = min(max(pos_z, self.min_z_arm), self.max_z_arm)
 
-        pose = Pose()
-        pose.position.x = self.position_x
-        pose.position.y = self.position_y
-        pose.position.z = self.position_z
+        joint_state = JointState()
+        joint_state.position = [pos_x, pos_y, pos_z]
 
-        """
-        pose.orientation.x = 0.0
-        pose.orientation.y = 0.0
-        pose.orientation.z = 0.0
-        pose.orientation.w = 0.0
-        """
+        pub.publish(joint_state)
 
-        self.arm_posit_pub.publish(pose)
-
-        if data.buttons[self.circle] == 1:
+        if data.buttons[self.B] == 1:
             self.reset_arm()
+
+        return pos_x, pos_y, pos_z
     
     # Puts arm back to starting position
     def reset_arm(self):
-        self.position_x = 0.0
-        self.position_y = 0.0
-        self.position_z = 0.0
-        self.orientation_x = 0.0
-        self.orientation_y = 0.0
-        self.orientation_z = 0.0
-        self.orientation_w = 0.0
+
+        if self.arm1:
+            self.position_x_1 = 0.0
+            self.position_y_1 = 0.0
+            self.position_z_1 = 0.0
+        else:
+            self.position_x_2 = 0.0
+            self.position_y_2 = 0.0
+            self.position_z_2 = 0.0
+
 
     def end_effector(self, data):
 
@@ -212,13 +227,17 @@ class TeleopNode:
         array.data = [int(self.end_effector_first), int(self.end_effector_second)]
         self.end_effector_pub.publish(array)
 
-        if data.buttons[self.triangle] == 1:
+        if data.buttons[self.X] == 1:
             self.end_effector_reset(data)
 
     # Puts end effector back to starting position
     def end_effector_reset(self, data):
         self.end_effector_second = 90
         self.end_effector_first = 90
+
+    def end_effector_pose(self, data):
+        pass
+
 
     """
     # Function that sets all value to 0 for safety measure when switching to arm mode
@@ -241,23 +260,31 @@ class TeleopNode:
 
         # Bypass that R2 and L2 starts with 0 as default value and changes to 1 when pressed
         # When using these buttons make need to check if they are initiated
-        if not self.turning_buttons_initiated_ and data.axes[self.linear_L2] == 1 and data.axes[self.linear_R2] == 1:
+        if not self.turning_buttons_initiated_ and data.axes[self.LT] == 1 and data.axes[self.RT] == 1:
             self.turning_buttons_initiated_ = True
+
+        if data.buttons[self.X] == 1:
+            self.arm1 = not self.arm1 
 
 
         # Check if buttons are pressed
-        if data.buttons[self.cross] == 1:
+        if data.buttons[self.A] == 1:
             self.home_steering()
 
         if data.buttons[self.R3] == 1 and data.buttons[self.L3] == 1:
             self.safety_stop()
 
-        if data.buttons[self.square] == 1:
+        if data.buttons[self.Y] == 1:
             self.end_effector(data)
+        elif not self.arm1:
+            self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(data, self.position_x_2, self.position_y_2, self.position_z_2, self.arm_posit_pub2)
         else:
-            self.controll_arm(data)
+            self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(data, self.position_x_1, self.position_y_1, self.position_z_1, self.arm_posit_pub1)
 
 
+
+
+        self.driving(data)
 
         """
         # Switch between controlling the arm and driving,
@@ -278,10 +305,6 @@ class TeleopNode:
             self.driving(data)
         """
 
-
-        self.driving(data)
-
-
 if __name__ == '__main__':
     Teleop_Node = TeleopNode()
     Teleop_Node.run()
@@ -290,6 +313,14 @@ if __name__ == '__main__':
 
 """
 Write in c++
+
+Write code that uses button to move end effector to nine preset poses
+
+Fiks controller for whats up and down on end effector
+
+
+
+
 
 Write better code
 Safety stop on arm
