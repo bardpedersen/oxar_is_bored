@@ -12,7 +12,7 @@ This README file provides a visual mapping of every button on an Xbox controller
 4. **Back Button**: Used to decreese the arm speed
 5. **LB Button**: Decreese the driving speed
 6. **LT Button**: Controll the arm in z-direction, LT is positiv direction
-7. **Xbox Button**: ---
+7. **Xbox Button**: Switches between the end effectors
 8. **Start Button**: Increese the arm speed
 9. **RT Button**: Controll the arm in z-direction, RT is negativ direction
 10. **RB Button**: Increese the driving speed
@@ -23,10 +23,10 @@ This README file provides a visual mapping of every button on an Xbox controller
 
 **L3** and **R3** the safety service is called and the robot stops.
 
+**LT** and **RT** need to be pressed down completly before they are in use.
+
 ## Usage
+
 You can refer to this button mapping diagram when driving thorvald and controlling the arms with the teleop_node_py.py
-
-
--- means not in use.
 
 **L3** is **Left stick** pressed down, and **R3** is **Right stick** pressed down.

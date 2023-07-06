@@ -25,7 +25,7 @@ void jointAnglesCallback(const std_msgs::Int32MultiArray& msg) {
 }
 
 
-ros::Subscriber<std_msgs::Int32MultiArray> sub("joint_angles", &jointAnglesCallback);
+ros::Subscriber<std_msgs::Int32MultiArray> sub("endeffector1", &jointAnglesCallback);
 
 void setup() {
   Serial.begin(115200);

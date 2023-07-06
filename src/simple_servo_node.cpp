@@ -30,6 +30,11 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("joint_angles", 10);
 
+    std::string left_right;
+    nh.param<std::string>("left_right", left_right, "left");
+
+    std::int32_t increment_size = 1;
+
     std_msgs::Int32MultiArray joint_angles;
     joint_angles.data.resize(2);
     joint_angles.data[0] = 90;
@@ -41,31 +46,72 @@ int main(int argc, char** argv)
     while (ros::ok())
     {
         int c = getch();
+        switch (c){
 
-        switch (c)
-        {
+            case 43:  // +
+                increment_size += 1;
+                break;
+            case 45:  // -
+                increment_size -= 1;
+                break;
+            
+        /*
+        Need to be less buggy
+        */
+        }
+
+        if(left_right == "left"){  
+            switch (c){
             case 65:  // Up arrow key
                 if (joint_angles.data[1] < 180)
-                    joint_angles.data[1]++;
+                    joint_angles.data[1] -= increment_size;
                 break;
             case 66:  // Down arrow key
                 if (joint_angles.data[1] > 0)
-                    joint_angles.data[1]--;
+                    joint_angles.data[1] += increment_size;
                 break;
             case 67:  // Right arrow key
                 if (joint_angles.data[0] < 180)
-                    joint_angles.data[0]++;
+                    joint_angles.data[0] -= increment_size;
                 break;
             case 68:  // Left arrow key
                 if (joint_angles.data[0] > 0)
-                    joint_angles.data[0]--;
+                    joint_angles.data[0] += increment_size;
                 break;
             case 'x':
                 return 0;
+            }
+        }
+
+        else if(left_right == "right"){  
+            switch (c){
+            case 65:  // Up arrow key
+                if (joint_angles.data[1] < 180)
+                    joint_angles.data[1] += increment_size;
+                break;
+            case 66:  // Down arrow key
+                if (joint_angles.data[1] > 0)
+                    joint_angles.data[1] -= increment_size;
+                break;
+            case 67:  // Right arrow key
+                if (joint_angles.data[0] < 180)
+                    joint_angles.data[0] += increment_size;
+                break;
+            case 68:  // Left arrow key
+                if (joint_angles.data[0] > 0)
+                    joint_angles.data[0] -= increment_size;
+                break;
+            case 'x':
+                return 0;
+            }                     
         }
 
         pub.publish(joint_angles);
     }
 
     return 0;
+
+    /*
+    Last ellement in list is first servo.
+    */
 }

@@ -10,8 +10,7 @@
     <param name="autorepeat_rate" value="$(arg joy_autorepeat_rate)" />
   </node>
 
-  <node pkg="video_visualizer" type="teleop_node_py.py" name="teleop_node" output="screen">
-    <remap from="home_steering" to="base_driver/home_steering" />
+  <node pkg="video_visualizer" type="teleop_arm.py" name="teleop_node" output="screen">
     <remap from="safety_stop" to="base_driver/safety_stop" />
   </node>
 
