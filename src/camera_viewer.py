@@ -72,9 +72,17 @@ class CameraDisplayNode:
 
     def run(self):
         rospy.init_node("camera_viewer_node")
+        rospy.loginfo("Camera viewer node has been started")
+        param_name = "camera_topics"
 
-        # Get the camera topics from ROS parameters
-        camera_topics = rospy.get_param("~camera_topics", [])
+        # Wait for the parameter to be set
+        while not rospy.has_param(param_name):
+            rospy.sleep(1)
+            rospy.loginfo(f"Waiting for parameter '{param_name}' to be set")
+
+        camera_topics = rospy.get_param(param_name)
+        rospy.loginfo("Camera topics: %s", camera_topics)
+
 
         # Create a controller subscriber
         controller_subscriber = rospy.Subscriber("/joy", Joy, self.joy_callback)

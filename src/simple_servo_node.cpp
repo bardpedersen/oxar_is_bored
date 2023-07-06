@@ -24,11 +24,11 @@ int getch()
     return ch;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     ros::init(argc, argv, "keyboard_publisher");
     ros::NodeHandle nh;
-    ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("joint_angles", 10);
+    ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("joint_angles", 20);
 
     std::string left_right;
     nh.param<std::string>("left_right", left_right, "left");
