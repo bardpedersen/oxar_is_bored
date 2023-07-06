@@ -1,0 +1,10 @@
+<launch>
+
+   <!-- Finds the cameras -->
+   <node pkg="video_visualizer" type="video_finder.py" name="video_finder"></node>
+   <!-- Creats topics and publishers for each camera  -->
+   <node pkg="video_visualizer" type="video_publisher.py" name="video_publisher"></node>
+   <!-- Visualize each video topic  -->
+   <node pkg="video_visualizer" type="camera_viewer.py" name="camera_viewer" output="screen"></node>
+   
+</launch>
