@@ -11,7 +11,7 @@
   </node>
 
   <node pkg="video_visualizer" type="teleop_arm.py" name="teleop_node" output="screen">
-    <remap from="safety_stop" to="base_driver/safety_stop" />
+    <remap from="safety_stop" to="safety_stop" />
   </node>
 
 </launch>

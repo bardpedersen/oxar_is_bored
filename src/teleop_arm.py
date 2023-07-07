@@ -3,7 +3,7 @@
 import rospy
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Twist
-from std_srvs.srv import Trigger, TriggerRequest
+from std_srvs.srv import SetBool, SetBoolRequest
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray
 
@@ -52,6 +52,7 @@ class TeleopNode:
         self.L3_R3_button_prev_state = False
         self.R3_button_prev_state = False
         self.mirror = False
+        self.safety_stop_= False
 
 
         # Variables for storing arm positions
@@ -118,6 +119,8 @@ class TeleopNode:
         # Create a subscriber to the "joy" topic with the function "joy_callback" as a callback
         rospy.Subscriber('/joy', Joy, self.joy_callback)
 
+        self.safety_stop_service = rospy.ServiceProxy('safety_stop', SetBool)
+
 
     # Loop that keeps the ros node running
     def run(self):
@@ -126,9 +129,21 @@ class TeleopNode:
 
     # Call the "safety_stop" service
     def safety_stop(self):
-        rospy.loginfo('Safety stop')
-
-
+        request = SetBoolRequest()
+        try:
+            if self.safety_stop_:
+                request.data = True
+                rospy.loginfo("Safety Enabled")
+            else:
+                request.data = False
+                rospy.loginfo("Safety Dissabled")
+            response = self.safety_stop_service(request)
+            if response.success:
+                rospy.loginfo('Safety stop successfully!')
+            else:
+                rospy.logwarn('Failed to safety stop.')
+        except rospy.ServiceException as e:
+            rospy.logerr('Service call failed: ' + str(e))
 
 
     # Function for controlling the arms
@@ -254,7 +269,9 @@ class TeleopNode:
         # Check if the RT and LT buttons have been pressed, first then are they in use
         if not self.T_buttons_initiated_ and data.axes[self.LT] == 1 and data.axes[self.RT] == 1:
             self.T_buttons_initiated_ = True
+            rospy.loginfo("LT and RT are ready to be used")
 
+    
         # Changes only when RB button is pressed, not hold down
         if data.buttons[self.RB] == 1 and not self.RB_button_prev_state:
             self.arm1_initiated = not self.arm1_initiated 
@@ -321,25 +338,29 @@ class TeleopNode:
             self.arm_speed_control = min(max(self.arm_speed_control, self.arm_min_speed), self.arm_max_speed)
             rospy.loginfo(self.arm_speed_control)
 
-
-        if data.buttons[self.R3] == 1 and data.buttons[self.L3] == 1:
+        if data.buttons[self.R3] == 1 and data.buttons[self.L3] == 1 and not self.L3_R3_button_prev_state:
+            self.safety_stop_ = not self.safety_stop_
             self.safety_stop()
+        if data.buttons[self.R3] == 1 and data.buttons[self.L3] == 1:
+            self.L3_R3_button_prev_state = True
+        else:
+            self.L3_R3_button_prev_state = False
 
+        if not self.safety_stop_:
         # Choses witch arms and end effectors are active
         # Left arm
-        if self.endeffector2_initiated:
-            self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(data, self.end_effector2_M1, self.end_effector2_M2, self.end_effector_pub2, self.mirror, left=True)
+            if self.endeffector2_initiated:
+                self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(data, self.end_effector2_M1, self.end_effector2_M2, self.end_effector_pub2, self.mirror, left=True)
 
-        # Right arm
-        if self.endeffector1_initiated:
-            self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(data, self.end_effector1_M1, self.end_effector1_M2, self.end_effector_pub1)
+            # Right arm
+            if self.endeffector1_initiated:
+                self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(data, self.end_effector1_M1, self.end_effector1_M2, self.end_effector_pub1)
 
-        if self.arm2_initiated:
-            self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(data, self.position_x_2, self.position_y_2, self.position_z_2, self.arm_posit_pub2, self.mirror, left=True)
-        
-        if self.arm1_initiated:
-            self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(data, self.position_x_1, self.position_y_1, self.position_z_1, self.arm_posit_pub1)
-
+            if self.arm2_initiated:
+                self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(data, self.position_x_2, self.position_y_2, self.position_z_2, self.arm_posit_pub2, self.mirror, left=True)
+            
+            if self.arm1_initiated:
+                self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(data, self.position_x_1, self.position_y_1, self.position_z_1, self.arm_posit_pub1)
 
 
 if __name__ == '__main__':
