@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(video_visualizer)
+project(oxar_is_bored)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -129,9 +129,6 @@ include_directories(
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/video_visualizer.cpp
 # )
-
-add_executable(simple_servo_node src/simple_servo_node.cpp)
-target_link_libraries(simple_servo_node ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

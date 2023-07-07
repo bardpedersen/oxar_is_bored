@@ -2,7 +2,6 @@
 
 import rospy
 from sensor_msgs.msg import Joy
-from geometry_msgs.msg import Twist
 from std_srvs.srv import SetBool, SetBoolRequest
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray
@@ -116,6 +115,9 @@ class TeleopNode:
         self.end_effector_pub1 = rospy.Publisher('/endeffector1', Int32MultiArray, queue_size=10)
         self.end_effector_pub2 = rospy.Publisher('/endeffector2', Int32MultiArray, queue_size=10)
 
+        # Create a service proxy for the "safety_stop" service
+        self.safety_stop_service = rospy.ServiceProxy('safety_stop', Trigger)
+
         # Create a subscriber to the "joy" topic with the function "joy_callback" as a callback
         rospy.Subscriber('/joy', Joy, self.joy_callback)
 
@@ -207,7 +209,7 @@ class TeleopNode:
         joint_state = JointState()
         joint_state.position = [pos_x, pos_y, pos_z]
         joint_state.velocity = [0.0]
-        joint_state.effort = [0.0]
+        joint_state.effort = [0] # E stop could turn this to one, two when done and then 0 again
 
         pub.publish(joint_state)
 
