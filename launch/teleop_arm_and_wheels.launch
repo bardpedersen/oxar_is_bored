@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="joy_dev" default="/dev/input/js0" />
+  <arg name="joy_dev" default="/dev/input/js1" />
   <arg name="joy_autorepeat_rate" default="20" />
   <arg name="joy_deadzone" default="0.05" />
 
@@ -10,9 +10,8 @@
     <param name="autorepeat_rate" value="$(arg joy_autorepeat_rate)" />
   </node>
 
-  <node pkg="oxar_is_bored" type="teleop_node_py.py" name="teleop_node" output="screen">
+  <node pkg="oxar_is_bored" type="teleop_arm_and_wheels.py" name="teleop_node" output="screen">
     <remap from="home_steering" to="base_driver/home_steering" />
-    <remap from="safety_stop" to="base_driver/safety_stop" />
   </node>
 
 </launch>
