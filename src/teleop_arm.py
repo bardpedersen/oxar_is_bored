@@ -5,6 +5,7 @@ from sensor_msgs.msg import Joy
 from std_srvs.srv import SetBool, SetBoolRequest
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray
+from geometry_msgs.msg import PoseArray
 
 class TeleopNode:
     def __init__(self):
@@ -104,19 +105,19 @@ class TeleopNode:
         rospy.init_node('teleop_node')
 
         # Create publisher for the arm controller topic
-        self.arm_posit_pub1 = rospy.Publisher('/arm1position', JointState, queue_size=10)
-        self.arm_posit_pub2 = rospy.Publisher('/arm2position', JointState, queue_size=10)
+        self.arm_posit_pub1 = rospy.Publisher('arm1position', JointState, queue_size=10)
+        self.arm_posit_pub2 = rospy.Publisher('arm2position', JointState, queue_size=10)
 
         # Create publisher for the end effector controller topic
-        self.end_effector_pub1 = rospy.Publisher('/endeffector1', Int32MultiArray, queue_size=10)
-        self.end_effector_pub2 = rospy.Publisher('/endeffector2', Int32MultiArray, queue_size=10)
+        self.end_effector_pub1 = rospy.Publisher('endeffector1', Int32MultiArray, queue_size=10)
+        self.end_effector_pub2 = rospy.Publisher('endeffector2', Int32MultiArray, queue_size=10)
 
         # Create a service proxy for the "safety_stop" service
         self.safety_stop_service = rospy.ServiceProxy('safety_stop', SetBool)
 
         # Subscribe to actual values
-        rospy.Subscriber('actual arm position1', JointState, self.arm_pos1_callback)
-        rospy.Subscriber('actual arm position2', JointState, self.arm_pos2_callback)
+        rospy.Subscriber('arm1_cur_pos', PoseArray, self.arm_pos1_callback)
+        rospy.Subscriber('arm2_cur_pos', PoseArray, self.arm_pos2_callback)
 
         # Create a subscriber to the "joy" topic with the function "joy_callback" as a callback
         rospy.Subscriber('/joy', Joy, self.joy_callback)
@@ -128,15 +129,17 @@ class TeleopNode:
     # Makes position follow the real values when controller is not used
     def arm_pos1_callback(self, data):
         if self.reset_values:
-            self.position_x_1 = data.position[0]
-            self.position_y_1 = data.position[1]
-            self.position_z_1 = data.position[2]
+            for pose in data.poses:
+                self.position_x_1 = pose.position.x
+                self.position_y_1 = pose.position.y
+                self.position_z_1 = pose.position.z
 
     def arm_pos2_callback(self, data):
         if self.reset_values:
-            self.position_x_2 = data.position[0]
-            self.position_y_2 = data.position[1]
-            self.position_z_2 = data.position[2]
+            for pose in data.poses:
+                self.position_x_2 = pose.position.x
+                self.position_y_2 = pose.position.y
+                self.position_z_2 = pose.position.z
 
 
     # Call the "safety_stop" service
@@ -348,7 +351,7 @@ class TeleopNode:
 
         if not self.safety_stop_:
             # Will not publish data when safety stop is enabled
-            if self.T_buttons_initiated_ and (data.axes[self.LT]!=1 or data.axes[self.RT]!=1 or data.axes[self.L_up_down]!=0 or data.axes[self.R_left_right]!=0):
+            if self.T_buttons_initiated_ and (data.axes[self.LT]!=1 or data.axes[self.RT]!=1 or data.axes[self.L_up_down]!=0 or data.axes[self.R_left_right]!=0 or data.buttons[self.B] != 0):
                 self.reset_values = False
                 # Controlles only the arms that are activated
                 if self.arm2_initiated:
@@ -373,7 +376,7 @@ class TeleopNode:
 if __name__ == '__main__':
     # Initiate node
     Teleop_Node = TeleopNode()
-    
+
     # Keep script running
     Teleop_Node.run()
 
@@ -395,6 +398,8 @@ Write in c++
 Safety stop on arm
 
 Z- button improve 
+
+Cant go home without tuching buttons = bad.
 
 
 Only callback publish to arm when controller is used.
