@@ -113,7 +113,8 @@ class TeleopNode:
         self.end_effector_pub2 = rospy.Publisher('endeffector2', Int32MultiArray, queue_size=10)
 
         # Create a service proxy for the "safety_stop" service
-        self.safety_stop_service = rospy.ServiceProxy('safety_stop', SetBool)
+        self.safety_stop_service1 = rospy.ServiceProxy('safety_stop_arm1', SetBool)
+        self.safety_stop_service2 = rospy.ServiceProxy('safety_stop_arm2', SetBool)
 
         # Subscribe to actual values
         rospy.Subscriber('arm1_cur_pos', PoseArray, self.arm_pos1_callback)
@@ -152,8 +153,9 @@ class TeleopNode:
             else:
                 request.data = False
                 rospy.loginfo("Safety Dissabled")
-            response = self.safety_stop_service(request)
-            if response.success:
+            response1 = self.safety_stop_service1(request)
+            response2 = self.safety_stop_service2(request)          
+            if response1.success and response2.success:
                 rospy.loginfo('Safety stop successfully!')
             else:
                 rospy.logwarn('Failed to safety stop.')
@@ -232,12 +234,12 @@ class TeleopNode:
     def end_effector(self, data, M1, M2, pub, mirror=False, left=False):
         # Controlls for right arm
         if not left:
-            m1_nav = -data.axes[self.d_pad_up_down]
-            m2_nav = -data.axes[self.d_pad_left_right]
+            m1_nav = data.axes[self.d_pad_up_down]
+            m2_nav = data.axes[self.d_pad_left_right]
 
         # Controlls for left arm
         if left:
-            m1_nav = -data.axes[self.d_pad_up_down]
+            m1_nav = data.axes[self.d_pad_up_down]
             m2_nav = -data.axes[self.d_pad_left_right]
             # Moves upisit of the right arm
             if mirror: 
@@ -351,7 +353,7 @@ class TeleopNode:
 
         if not self.safety_stop_:
             # Will not publish data when safety stop is enabled
-            if self.T_buttons_initiated_ and (data.axes[self.LT]!=1 or data.axes[self.RT]!=1 or data.axes[self.L_up_down]!=0 or data.axes[self.R_left_right]!=0 or data.buttons[self.B] != 0):
+            if self.T_buttons_initiated_ and (data.axes[self.LT]!=1 or data.axes[self.RT]!=1 or data.axes[self.L_up_down]!=0 or data.axes[self.R_left_right]!=0 or data.buttons[self.B]!=0 or data.buttons[self.xbox]!=0):
                 self.reset_values = False
                 # Controlles only the arms that are activated
                 if self.arm2_initiated:
@@ -395,14 +397,6 @@ Start and back is used for changing the speed of the arm and end effector
 Write better code
 Write in c++
 
-Safety stop on arm
-
 Z- button improve 
 
-Cant go home without tuching buttons = bad.
-
-
-Only callback publish to arm when controller is used.
-When controller isnt used:
-Get position from arm to set as values.
 """

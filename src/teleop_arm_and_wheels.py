@@ -7,6 +7,7 @@ from std_srvs.srv import Trigger, TriggerRequest
 from std_srvs.srv import SetBool, SetBoolRequest
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray
+from geometry_msgs.msg import PoseArray
 
 class TeleopNode:
     def __init__(self):
@@ -46,6 +47,7 @@ class TeleopNode:
         self.xbox_button_prev_state = False
         self.L3_R3_button_prev_state = False
         self.safety_stop_= False
+        self.reset_values = False
 
 
         # Variables for storing arm positions
@@ -63,17 +65,17 @@ class TeleopNode:
         self.home_position_z = 300
 
         # Variables for boundries for the arms
-        self.min_x_arm = 0
-        self.max_x_arm = 500
+        self.min_x_arm = -600
+        self.max_x_arm = 600
         self.min_y_arm = 0
-        self.max_y_arm = 500
+        self.max_y_arm = 600
         self.min_z_arm = 0
         self.max_z_arm = 500
 
         # Variables for speed control for the arms
-        self.arm_speed_control = 1
-        self.arm_max_speed = 10
-        self.arm_min_speed = 0.5
+        self.arm_speed_control = 2
+        self.arm_max_speed = 5
+        self.arm_min_speed = 0.1
 
 
         # Variables for storing end effector positions
@@ -97,15 +99,23 @@ class TeleopNode:
         rospy.init_node('teleop_node')
 
         # Create a publisher for the cmd_vel topic
-        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
 
         # Create publisher for the arm controller topic
-        self.arm_posit_pub1 = rospy.Publisher('/arm1position', JointState, queue_size=10)
-        self.arm_posit_pub2 = rospy.Publisher('/arm2position', JointState, queue_size=10)
+        self.arm_posit_pub1 = rospy.Publisher('arm1position', JointState, queue_size=10)
+        self.arm_posit_pub2 = rospy.Publisher('arm2position', JointState, queue_size=10)
 
         # Create publisher for the end effector controller topic
-        self.end_effector_pub1 = rospy.Publisher('/endeffector1', Int32MultiArray, queue_size=10)
-        self.end_effector_pub2 = rospy.Publisher('/endeffector2', Int32MultiArray, queue_size=10)
+        self.end_effector_pub1 = rospy.Publisher('endeffector1', Int32MultiArray, queue_size=10)
+        self.end_effector_pub2 = rospy.Publisher('endeffector2', Int32MultiArray, queue_size=10)
+
+        # Create a service proxy for the "safety_stop" service
+        self.safety_stop_service_arm1 = rospy.ServiceProxy('safety_stop_arm1', SetBool)
+        self.safety_stop_service_arm2 = rospy.ServiceProxy('safety_stop_arm2', SetBool)
+
+        # Subscribe to actual values
+        rospy.Subscriber('arm1_cur_pos', PoseArray, self.arm_pos1_callback)
+        rospy.Subscriber('arm2_cur_pos', PoseArray, self.arm_pos2_callback)
 
         # Create a subscriber to the "joy" topic with the function "joy_callback" as a callback
         rospy.Subscriber('/joy', Joy, self.joy_callback)
@@ -116,7 +126,6 @@ class TeleopNode:
         # Create a service proxy for the "safety_stop" service, for wheels
         self.safety_stop_service_wheel = rospy.ServiceProxy('base_link/safety_stop', Trigger)
         # Safety for arms
-        self.safety_stop_service_arm = rospy.ServiceProxy('safety_stop', SetBool)
 
         rospy.loginfo('Teleop_node started')
         rospy.loginfo('Arm 1 enabled')
@@ -126,19 +135,20 @@ class TeleopNode:
     def run(self):
         rospy.spin()
 
+    # Makes position follow the real values when controller is not used
+    def arm_pos1_callback(self, data):
+        if self.reset_values:
+            for pose in data.poses:
+                self.position_x_1 = pose.position.x
+                self.position_y_1 = pose.position.y
+                self.position_z_1 = pose.position.z
 
-    # Call the "home_steering" service
-    def home_steering(self):
-        trigger_req = TriggerRequest()
-
-        try:
-            response = self.home_steering_service(trigger_req)
-            if response.success:
-                rospy.loginfo('Steering homed successfully!')
-            else:
-                rospy.logwarn('Failed to home steering.')
-        except rospy.ServiceException as e:
-            rospy.logerr('Service call failed: ' + str(e))
+    def arm_pos2_callback(self, data):
+        if self.reset_values:
+            for pose in data.poses:
+                self.position_x_2 = pose.position.x
+                self.position_y_2 = pose.position.y
+                self.position_z_2 = pose.position.z
 
 
     # Call the "safety_stop" service
@@ -163,8 +173,9 @@ class TeleopNode:
             else:
                 request.data = False
                 rospy.loginfo("Safety Dissabled")
-            response = self.safety_stop_service_arm(request)
-            if response.success:
+            response1 = self.safety_stop_service_arm1(request)
+            response2 = self.safety_stop_service_arm2(request)          
+            if response1.success and response2.success:
                 rospy.loginfo('Safety stop successfully!')
             else:
                 rospy.logwarn('Failed to safety stop.')
@@ -201,8 +212,8 @@ class TeleopNode:
 
         # Controlls for left arm
         if left:
-            x_nav = -data.axes[self.d_pad_left_right]
-            y_nav = data.axes[self.d_pad_up_down]
+            x_nav = data.axes[self.d_pad_left_right]
+            y_nav = -data.axes[self.d_pad_up_down]
 
         # Increasing the values within the limits
         pos_x += x_nav * self.arm_speed_control
@@ -229,10 +240,11 @@ class TeleopNode:
         joint_state = JointState()
         joint_state.position = [pos_x, pos_y, pos_z]
         joint_state.velocity = [0.0]
-        joint_state.effort = [0] # E stop could turn this to one, two when done and then 0 again
+        joint_state.effort = [0]
 
         pub.publish(joint_state)
 
+        # Returns the updated varibals so it can be stored
         return pos_x, pos_y, pos_z
 
     # Function for controlling the end effector
@@ -265,6 +277,7 @@ class TeleopNode:
         array.data = [int(M1), int(M2)]
         pub.publish(array)
 
+        # Returns the updated varibals so it can be stored
         return M1, M2
 
     # Callback function for the "joy" topic
@@ -322,22 +335,26 @@ class TeleopNode:
         # Choses witch arm and end effector to controll with joy
         if not self.safety_stop_:
             # Can only controll end effector when Y is pressed down
-            if data.buttons[self.Y] == 1:
-                if not self.endeffector1_initiated:
-                    self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(data, self.end_effector2_M1, self.end_effector2_M2, self.end_effector_pub2, left=True)
+            if data.buttons[self.Y]!=0 or data.axes[self.LT]!=1 or data.axes[self.RT]!=1 or data.axes[self.d_pad_left_right]!=0 or data.axes[self.d_pad_up_down]!=0 or data.buttons[self.B]!=0:
+                self.reset_values = False
+                if data.buttons[self.Y] == 1:
+                    if not self.endeffector1_initiated:
+                        self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(data, self.end_effector2_M1, self.end_effector2_M2, self.end_effector_pub2, left=True)
+                    else:
+                        self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(data, self.end_effector1_M1, self.end_effector1_M2, self.end_effector_pub1)
+
+                elif not self.arm1_initiated:
+                    self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(data, self.position_x_2, self.position_y_2, self.position_z_2, self.arm_posit_pub2)
                 else:
-                    self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(data, self.end_effector1_M1, self.end_effector1_M2, self.end_effector_pub1)
-
-            elif not self.arm1_initiated:
-                self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(data, self.position_x_2, self.position_y_2, self.position_z_2, self.arm_posit_pub2)
+                    self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(data, self.position_x_1, self.position_y_1, self.position_z_1, self.arm_posit_pub1)
             else:
-                self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(data, self.position_x_1, self.position_y_1, self.position_z_1, self.arm_posit_pub1)
-
+                self.reset_values = True 
             # Call driving function
             self.driving(data)
 
 
 if __name__ == '__main__':
+    # Initiate node
     Teleop_Node = TeleopNode()
     Teleop_Node.run()
 
@@ -357,8 +374,6 @@ Write better code
 Write in c++
 
 Safety stop on truning
-
-One node for driving
 
 Hold button and press a button to switch between cameras
 
