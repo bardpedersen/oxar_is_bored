@@ -1,0 +1,50 @@
+axes_map: {
+            axis_L_side: 0,
+            axis_L_up: 1,
+            axis_LT: 2,
+            axis_R_side: 3,
+            axis_R_up: 4,
+            axis_RT: 5,
+            axis_Dpad_side: 6, 
+            axis_Dpad_up: 7  
+          }
+
+
+button_map: {
+              button_A: 0,
+              button_B: 1,
+              button_X: 2,
+              button_Y: 3,
+              button_LB: 4, 
+              button_RB: 5, 
+              button_back: 6, 
+              button_start: 7,
+              button_xbox: 8, 
+              button_L3: 9, 
+              button_R3: 10 
+            }
+
+
+
+activate_arm1_button: button_LB
+activate_arm2_button: button_RB
+activate_endef1_button: button_X
+activate_endef2_button: button_Y
+
+increase_arm_speed: button_start
+decrease_arm_speed: button_back
+
+arm_up: axis_LT
+arm_down: axis_RT
+arm_x: axis_R_side
+arm_y: axis_L_up
+
+endef_up: axis_Dpad_up
+endef_down: axis_Dpad_side
+
+frame_change: button_A
+home_button: button_B
+end_button: button_xbox
+
+safety_stop_button: [button_L3, button_R3]
+
