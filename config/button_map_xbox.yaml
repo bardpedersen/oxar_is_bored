@@ -25,26 +25,26 @@ button_map: {
             }
 
 
-
-activate_arm1_button: button_LB
-activate_arm2_button: button_RB
-activate_endef1_button: button_X
-activate_endef2_button: button_Y
+activate_arm1_button: button_RB
+activate_arm2_button: button_LB
+activate_endef1_button: button_Y
+activate_endef2_button: button_X
 
 increase_arm_speed: button_start
 decrease_arm_speed: button_back
 
 arm_up: axis_LT
 arm_down: axis_RT
-arm_x: axis_R_side
-arm_y: axis_L_up
+arm_y: axis_R_side
+arm_x: axis_L_up
 
 endef_up: axis_Dpad_up
-endef_down: axis_Dpad_side
+endef_left: axis_Dpad_side
 
 frame_change: button_A
 home_button: button_B
 end_button: button_xbox
+mirror_button: button_R3
 
 safety_stop_button: [button_L3, button_R3]
 
