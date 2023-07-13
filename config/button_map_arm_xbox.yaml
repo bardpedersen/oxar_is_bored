@@ -1,3 +1,4 @@
+# Mappes the axes for xbox controller
 axes_map: {
             axis_L_side: 0,
             axis_L_up: 1,
@@ -9,7 +10,7 @@ axes_map: {
             axis_Dpad_up: 7  
           }
 
-
+# Mappes the buttons for xbox controller
 button_map: {
               button_A: 0,
               button_B: 1,
@@ -25,6 +26,7 @@ button_map: {
             }
 
 
+# Button actions with corresponding button
 activate_arm1_button: button_RB
 activate_arm2_button: button_LB
 activate_endef1_button: button_Y

@@ -1,0 +1,29 @@
+# Limitation for arms
+min_x_arm: -600
+max_x_arm: 600
+min_y_arm: 0
+max_y_arm: 600
+min_z_arm: 0
+max_z_arm: 500
+
+# Limitation for arm speed
+arm_max_speed: 5
+arm_min_speed: 0.1
+
+# Limitation for wheel speed
+drive_max_speed: 5
+drive_min_speed: 0.1
+        
+# Limitation for the end effector
+min_x_end_effector: 0
+max_x_end_effector: 180
+
+# Home position for the arms 
+home_position_x: 0
+home_position_y: 200
+home_position_z: 300
+
+# End position for the arms
+end_position_x: 0
+end_position_y: 200
+end_position_z: 500
