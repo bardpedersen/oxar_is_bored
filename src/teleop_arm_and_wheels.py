@@ -98,7 +98,7 @@ class TeleopNode:
         self.joy_data = 0
 
         # Create a publisher for the cmd_vel topic
-        self.cmd_vel_pub = rospy.Publisher('teleop_joy/cmd_vel', Twist, queue_size=10)
+        self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
 
         # Create publisher for the arm controller topic
         self.arm_posit_pub1 = rospy.Publisher('arm1position', JointState, queue_size=10)
@@ -112,19 +112,18 @@ class TeleopNode:
         self.safety_stop_service1 = rospy.ServiceProxy('safety_stop_arm1', SetBool)
         self.safety_stop_service2 = rospy.ServiceProxy('safety_stop_arm2', SetBool)
 
+        # Create a service proxy for the "safety_stop" service, for wheels
+        self.safety_stop_service_wheel = rospy.ServiceProxy('safety_stop', SetBool)
+
+        # Create a service proxy for the "home_steering" service
+        self.home_steering_service = rospy.ServiceProxy('home_steering', Trigger)
+
         # Subscribe to actual values
         rospy.Subscriber('arm1_cur_pos', PoseArray, self.arm_pos1_callback)
         rospy.Subscriber('arm2_cur_pos', PoseArray, self.arm_pos2_callback)
 
         # Create a subscriber to the "joy" topic with the function "joy_callback" as a callback
         rospy.Subscriber('joy_arms_wheels', Joy, self.joy_callback)
-
-        # Create a service proxy for the "home_steering" service
-        self.home_steering_service = rospy.ServiceProxy('home_steering', Trigger)
-
-        # Create a service proxy for the "safety_stop" service, for wheels
-        self.safety_stop_service_wheel = rospy.ServiceProxy('safety_stop', Trigger)
-        # Safety for arms
 
         rospy.loginfo('Teleop_node started')
         rospy.loginfo('Arm 1 enabled')
@@ -149,38 +148,35 @@ class TeleopNode:
 
     # Calls safety stop service to stop arms
     def safety_stop(self):
-        # Safety for wheels
-        trigger_req = TriggerRequest()
+        request = SetBoolRequest()
+        request.data = self.safety_stop_
+        # Arm1
         try:
-            response = self.safety_stop_service_wheel(trigger_req)
+            response = self.safety_stop_service1(request)
             if response.success:
-                rospy.loginfo('Safety stop successfully!')
+                rospy.loginfo('Safety stop arm1 successfully!')
             else:
                 rospy.logwarn('Failed to safety stop.')
         except rospy.ServiceException as e:
             rospy.logerr('Service call failed: ' + str(e))
 
-        # Safety for arms
-        request = SetBoolRequest()
+        # Arm 2
         try:
-            if self.safety_stop_:
-                request.data = True
-                rospy.loginfo("Safety Enabled")
+            response = self.safety_stop_service2(request)
+            if response.success:
+                rospy.loginfo('Safety stop arm2 successfully!')
             else:
-                request.data = False
-                rospy.loginfo("Safety Dissabled")
+                rospy.logwarn('Failed to safety stop.')
+        except rospy.ServiceException as e:
+            rospy.logerr('Service call failed: ' + str(e))
 
-            response1 = self.safety_stop_service1(request)
-            response2 = self.safety_stop_service2(request)          
-            if response1.success:
-                rospy.loginfo('Safety stop arm 1 successfully!')
+        # Wheels
+        try:
+            response = self.safety_stop_service_wheel(request)
+            if response.success:
+                rospy.loginfo('Safety stop wheels successfully!')
             else:
-                rospy.logwarn('Failed to stop arm1')
-            if response2.success:
-                rospy.loginfo('Safety stop arm 2 successfully!')
-            else:
-                rospy.logwarn('Failed to safety arm2')
-
+                rospy.logwarn('Failed to safety stop.')
         except rospy.ServiceException as e:
             rospy.logerr('Service call failed: ' + str(e))
 
@@ -336,6 +332,11 @@ class TeleopNode:
                 if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1 and not self.L3_R3_button_prev_state:
                     self.safety_stop_ = not self.safety_stop_
                     self.safety_stop()
+                    if self.safety_stop_:
+                        rospy.loginfo("Safety Enabled")
+                    else:
+                        rospy.loginfo("Safety Disabled")
+                        
                 if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1:
                     self.L3_R3_button_prev_state = True
                 else:
@@ -378,13 +379,13 @@ class TeleopNode:
                         joint_state.effort = [0]
                         self.arm_posit_pub2.publish(joint_state)
 
-                    self.driving_speed()
                     self.reset_values = True
-                            # Create a Twist message and publish it with controls from the joysticks
-                    twist = Twist()
-                    twist.linear.x = self.joy_data.axes[self.axes_mapping[self.drive_forward]] * self.speed_controll # Forward/backward motion (left joystick up/down)
-                    twist.angular.z = self.joy_data.axes[self.axes_mapping[self.drive_turning]] * self.speed_controll # Rotation (left joystick left/right)
 
+                    # Create a Twist message and publish it with controls from the joysticks
+                    self.driving_speed()
+                    twist = Twist()
+                    twist.linear.x = self.joy_data.axes[self.axes_mapping[self.drive_forward]] * self.speed_controll
+                    twist.angular.z = self.joy_data.axes[self.axes_mapping[self.drive_turning]] * self.speed_controll 
                     self.cmd_vel_pub.publish(twist)
 
                 self.previous_button_pressed = self.joy_data.buttons

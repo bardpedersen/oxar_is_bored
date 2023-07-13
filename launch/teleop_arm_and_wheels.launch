@@ -19,6 +19,7 @@
 
   <!--Launch the teleop node-->
   <node pkg="oxar_is_bored" type="teleop_arm_and_wheels.py" name="teleop_node" output="screen">
+    <remap from="cmd_vel" to="teleop_joy/cmd_vel" />
     <remap from="home_steering" to="base_driver/home_steering" />
     <remap from="safety_stop" to="base_driver/safety_stop" />
     <rosparam param="button_map_arm_wheel_xbox">$(arg button_map_arm_wheel_xbox)</rosparam>
