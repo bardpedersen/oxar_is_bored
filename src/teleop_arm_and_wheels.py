@@ -324,10 +324,6 @@ class TeleopNode:
                     self.arm_speed_control = min(max(self.arm_speed_control, self.arm_min_speed), self.arm_max_speed)
                     rospy.loginfo(self.arm_speed_control)
 
-                # Call services
-                if self.evaluate_button(self.home_steering_button):
-                    self.home_steering()
-
                 # Activates the emergency stop 
                 if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1 and not self.L3_R3_button_prev_state:
                     self.safety_stop_ = not self.safety_stop_
@@ -380,6 +376,11 @@ class TeleopNode:
                         self.arm_posit_pub2.publish(joint_state)
 
                     self.reset_values = True
+
+                    # Call services
+                    if self.evaluate_button(self.home_steering_button):
+                        self.home_steering()
+
 
                     # Create a Twist message and publish it with controls from the joysticks
                     self.driving_speed()
