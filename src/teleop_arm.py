@@ -401,7 +401,7 @@ class TeleopNode:
 if __name__ == '__main__':
     # Initiate node
     # Initialize the ROS node
-    rospy.init_node('teleop_node')
+    rospy.init_node('teleop_node_arms')
     Teleop_Node = TeleopNode()
 
     # Keep script running
