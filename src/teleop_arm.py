@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
+import numpy as np
 import rospy
 from sensor_msgs.msg import Joy
 from std_srvs.srv import SetBool, SetBoolRequest
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Int32MultiArray, Float32MultiArray
 from geometry_msgs.msg import PoseArray
 
 class TeleopNode:
@@ -68,8 +69,6 @@ class TeleopNode:
         self.L3_R3_button_prev_state = False
         self.mirror = False
         self.safety_stop_= False
-        self.reset_values = False
-
         self.previous_button_pressed = [0] * len(self.button_mapping)
 
         # Variables for storing arm positions
@@ -111,6 +110,9 @@ class TeleopNode:
         rospy.Subscriber('arm1_cur_pos', PoseArray, self.arm_pos1_callback)
         rospy.Subscriber('arm2_cur_pos', PoseArray, self.arm_pos2_callback)
 
+        rospy.Subscriber('arm1_angle', Float32MultiArray, self.arm_endef_angle1)
+        rospy.Subscriber('arm2_angle', Float32MultiArray, self.arm_endef_angle2)
+
         # Create a subscriber to the "joy" topic with the function "joy_callback" as a callback
         rospy.Subscriber('joy_arms', Joy, self.joy_callback)
 
@@ -119,18 +121,27 @@ class TeleopNode:
 
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
-        if self.reset_values:
+        if not self.arm1_initiated:
             for pose in data.poses:
                 self.position_x_1 = pose.position.x
                 self.position_y_1 = pose.position.y
                 self.position_z_1 = pose.position.z
 
     def arm_pos2_callback(self, data):
-        if self.reset_values:
+        if not self.arm2_initiated:
             for pose in data.poses:
                 self.position_x_2 = pose.position.x
                 self.position_y_2 = pose.position.y
-                self.position_z_2 = pose.position.z      
+                self.position_z_2 = pose.position.z    
+
+    def arm_endef_angle1(self, data):
+        if not self.endeffector1_initiated:
+            self.end_effector1_M2 = min(max(np.degrees(data.data[0]), self.min_x_end_effector), self.max_x_end_effector)
+
+
+    def arm_endef_angle2(self, data):
+        if not self.endeffector2_initiated:
+            self.end_effector2_M2 = min(max(np.degrees(data.data[0]), self.min_x_end_effector), self.max_x_end_effector)
 
 
     # Calls safety stop service to stop arms
@@ -243,7 +254,7 @@ class TeleopNode:
                 m2_nav = -data.axes[self.axes_mapping[self.endef_left]]
                 if mirror:
                     m1_nav = data.axes[self.axes_mapping[self.endef_up]]
-                    m2_nav = data.axes[self.axes_mapping[self.endef_left]]            
+                    m2_nav = data.axes[self.axes_mapping[self.endef_left]]
 
         # Increasing the values within the limits
         M1 += m1_nav * self.arm_speed_control
@@ -326,7 +337,6 @@ class TeleopNode:
                     elif not self.mirror:
                         rospy.loginfo('Mirror disabled')
 
-
                 # Adjust the speed of the arms and end effectors
                 if self.evaluate_button(self.increase_arm_speed):
                     self.arm_speed_control += 0.1
@@ -349,36 +359,29 @@ class TeleopNode:
 
                 if not self.safety_stop_:
                     # Will not publish data when safety stop is enabled
-                    if self.T_buttons_initiated_ and (self.joy_data.axes[self.axes_mapping[self.arm_up]]!=1 or self.joy_data.axes[self.axes_mapping[self.arm_down]]!=1 or self.joy_data.axes[self.axes_mapping[self.arm_x]]!=0 or self.joy_data.axes[self.axes_mapping[self.arm_y]]!=0 or self.joy_data.buttons[self.button_mapping[self.home_button]]!=0 or self.joy_data.buttons[self.button_mapping[self.end_button]]!=0):
-                        self.reset_values = False
-                        # Controlles only the arms that are activated
-                        if self.arm2_initiated:
-                            self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(self.joy_data, self.position_x_2, self.position_y_2, self.position_z_2, self.mirror, left=True)
-                    
-                        if self.arm1_initiated:
-                            self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(self.joy_data, self.position_x_1, self.position_y_1, self.position_z_1)
+                    # Controlles only the arms that are activated
+                                    
+                    if self.arm1_initiated:
+                        self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(self.joy_data, self.position_x_1, self.position_y_1, self.position_z_1)
 
-                    else:
-                        # Will subscibe to the actual value of the arm so it does not jump to preveus set values here when controller is used
-                        self.reset_values = True
+                    if self.arm2_initiated:
+                        self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(self.joy_data, self.position_x_2, self.position_y_2, self.position_z_2, self.mirror, left=True)
 
-                    # Controlles only the end effectors that are activated
-                    if(self.joy_data.axes[self.axes_mapping[self.endef_up]]!=0 or self.joy_data.axes[self.axes_mapping[self.endef_left]]!=0):
-                        if self.endeffector2_initiated:
-                            self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(self.joy_data, self.end_effector2_M1, self.end_effector2_M2, self.mirror, left=True)
+                    if self.endeffector1_initiated:
+                        self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(self.joy_data, self.end_effector1_M1, self.end_effector1_M2)
 
-                        if self.endeffector1_initiated:
-                            self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(self.joy_data, self.end_effector1_M1, self.end_effector1_M2)
+                    if self.endeffector2_initiated:
+                        self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(self.joy_data, self.end_effector2_M1, self.end_effector2_M2, self.mirror, left=True)
 
                 # Publish only position when controller is used
-                if not self.reset_values:
-
+                if self.arm1_initiated:
                     joint_state = JointState()
                     joint_state.position = [self.position_x_1, self.position_y_1, self.position_z_1]
                     joint_state.velocity = [0.0]
                     joint_state.effort = [0]
                     self.arm_posit_pub1.publish(joint_state)
 
+                if self.arm2_initiated:
                     joint_state = JointState()
                     joint_state.position = [self.position_x_2, self.position_y_2, self.position_z_2]
                     joint_state.velocity = [0.0]
