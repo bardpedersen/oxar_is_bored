@@ -12,14 +12,13 @@ class CameraDisplayNode:
         self.images = []
         self.cv_bridge = CvBridge()
         self.index = 0
+        self.window_name = "Camera Display"
 
     def joy_callback(self, joy_msg):
-        
         # Check if the joystick button is pressed
         if joy_msg.axes[6] == -1:
             # Increment the camera index
             self.index = (self.index + 1) % len(self.camera_subscribers)
-
         elif joy_msg.axes[6] == 1:
             # Decrement the camera index
             self.index = (self.index - 1) % len(self.camera_subscribers)
@@ -39,36 +38,56 @@ class CameraDisplayNode:
 
         # Concatenate valid images side by side
         if valid_images:
-
             # Display the combined image
             if len(valid_images) == 1:
                 self.im_tile_resize = valid_images[0]
             else:
-                self.im_tile_resize = self.concat_tile_resize([[valid_images[self.index]],
-                                        valid_images])
-                
-            cv2.imshow("Camera Display", self.im_tile_resize)
-            cv2.waitKey(1)
+                self.im_tile_resize = self.concat_tile_resize([[valid_images[self.index]], valid_images])
 
+            # Add camera number text to each image
+            num_cameras = len(self.camera_subscribers)
+            image_width = int(self.im_tile_resize.shape[1] / num_cameras)
+            for i in range(num_cameras):
+                x = i * image_width + 5
+                y = 525
+                text = f"Camera {i + 1}"
+                cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+
+            # Show the combined image in full screen
+            cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
+            cv2.setWindowProperty(self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+            cv2.imshow(self.window_name, self.im_tile_resize)
 
         # Create the image by merging the height and width
+
     def concat_tile_resize(self, im_list_2d, interpolation=cv2.INTER_CUBIC):
         im_list_v = [self.hconcat_resize_min(im_list_h, interpolation=cv2.INTER_CUBIC) for im_list_h in im_list_2d]
         return self.vconcat_resize_min(im_list_v, interpolation=cv2.INTER_CUBIC)
-    
-        # Resize all images to the same width and concatenate them vertically
+
+    # Resize all images to the same width and concatenate them vertically
     def vconcat_resize_min(self, im_list, interpolation=cv2.INTER_CUBIC):
         w_min = min(im.shape[1] for im in im_list)
         im_list_resize = [cv2.resize(im, (w_min, int(im.shape[0] * w_min / im.shape[1])), interpolation=interpolation)
-                        for im in im_list]
+                          for im in im_list]
         return cv2.vconcat(im_list_resize)
-    
-        # Resize the images to the same height and concatenate them horizontally
+
+    # Resize the images to the same height and concatenate them horizontally
     def hconcat_resize_min(self, im_list, interpolation=cv2.INTER_CUBIC):
         h_min = min(im.shape[0] for im in im_list)
         im_list_resize = [cv2.resize(im, (int(im.shape[1] * h_min / im.shape[0]), h_min), interpolation=interpolation)
-                        for im in im_list]
+                          for im in im_list]
         return cv2.hconcat(im_list_resize)
+
+    def mouse_callback(self, event, x, y, flags, param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            num_cameras = len(self.camera_subscribers)
+            # Calculate the width of each image in the display window
+            image_width = int(self.im_tile_resize.shape[1] / num_cameras)
+
+            # Determine the index of the clicked image
+            clicked_index = x // image_width
+            if clicked_index < num_cameras:
+                self.index = clicked_index
 
     def run(self):
         rospy.init_node("camera_viewer_node")
@@ -83,7 +102,6 @@ class CameraDisplayNode:
         camera_topics = rospy.get_param(param_name)
         rospy.loginfo("Camera topics: %s", camera_topics)
 
-
         # Create a controller subscriber
         controller_subscriber = rospy.Subscriber("/joy", Joy, self.joy_callback)
 
@@ -92,6 +110,10 @@ class CameraDisplayNode:
             self.images.append(None)
             subscriber = rospy.Subscriber(topic, Image, self.camera_callback, callback_args=i)
             self.camera_subscribers.append(subscriber)
+
+        # Create a window and set the mouse callback function
+        cv2.namedWindow(self.window_name)
+        cv2.setMouseCallback(self.window_name, self.mouse_callback)
 
         rate = rospy.Rate(30)  # Display rate in Hz
 
