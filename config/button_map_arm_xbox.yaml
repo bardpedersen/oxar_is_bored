@@ -41,7 +41,7 @@ arm_y: axis_R_side
 arm_x: axis_L_up
 
 endef_up: axis_Dpad_up
-endef_left: axis_Dpad_side
+endef_side: axis_Dpad_side
 
 frame_change: button_A
 home_button: button_B

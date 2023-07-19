@@ -27,7 +27,7 @@ class TeleopNode:
         self.arm_x = rospy.get_param('arm_x')
         self.arm_y = rospy.get_param('arm_y')
         self.endef_up = rospy.get_param('endef_up')
-        self.endef_left = rospy.get_param('endef_left')
+        self.endef_side = rospy.get_param('endef_side')
         self.frame_change = rospy.get_param('frame_change')
         self.home_button = rospy.get_param('home_button')
         self.end_button = rospy.get_param('end_button')
@@ -117,6 +117,9 @@ class TeleopNode:
         rospy.Subscriber('joy_arms', Joy, self.joy_callback)
 
         rospy.loginfo('Teleop_node started')
+        rospy.loginfo('Press LB and RB to enable the arms')
+        rospy.loginfo('Press X and Y to enable the end effectors')
+        rospy.loginfo('Press L3 and R3 to enable safety stop')
 
 
     # Makes position follow the real values when controller is not in use
@@ -147,57 +150,56 @@ class TeleopNode:
     # Calls safety stop service to stop arms
     def safety_stop(self):
         request = SetBoolRequest()
+        request.data = self.safety_stop_
+        # Arm 1
         try:
-            if self.safety_stop_:
-                request.data = True
-                rospy.loginfo("Safety Enabled")
+            response = self.safety_stop_service1(request)
+            if response.success:
+                rospy.loginfo('Safety stop arm1 successfully!')
             else:
-                request.data = False
-                rospy.loginfo("Safety Dissabled")
+                rospy.logwarn('Failed to safety stop.')
+        except rospy.ServiceException as e:
+            rospy.logerr('Service call failed: ' + str(e))
 
-            response1 = self.safety_stop_service1(request)
-            response2 = self.safety_stop_service2(request)          
-            if response1.success:
-                rospy.loginfo('Safety stop arm 1 successfully!')
+        # Arm 2
+        try:
+            response = self.safety_stop_service2(request)
+            if response.success:
+                rospy.loginfo('Safety stop arm2 successfully!')
             else:
-                rospy.logwarn('Failed to stop arm1')
-            if response2.success:
-                rospy.loginfo('Safety stop arm 2 successfully!')
-            else:
-                rospy.logwarn('Failed to safety arm2')
-
+                rospy.logwarn('Failed to safety stop.')
         except rospy.ServiceException as e:
             rospy.logerr('Service call failed: ' + str(e))
 
 
     # Function for controlling the arms
-    def controll_arm(self, data, pos_x, pos_y, pos_z, mirror=False, left=False):   
+    def controll_arm(self, pos_x, pos_y, pos_z, mirror=False, left=False):   
 
         # Controlls for right arm
         if not left:
             # Check if the global frame is enabled
             if self.global_frame_point:
-                x_nav = data.axes[self.axes_mapping[self.arm_x]]
-                y_nav = data.axes[self.axes_mapping[self.arm_y]]
+                x_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]]
+                y_nav = self.joy_data.axes[self.axes_mapping[self.arm_y]]
             else:
-                x_nav = -data.axes[self.axes_mapping[self.arm_y]]
-                y_nav = data.axes[self.axes_mapping[self.arm_x]]
+                x_nav = -self.joy_data.axes[self.axes_mapping[self.arm_y]]
+                y_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]]
 
         # Controlls for left arm
         if left:
             if self.global_frame_point:
-                x_nav = -data.axes[self.axes_mapping[self.arm_x]]
-                y_nav = -data.axes[self.axes_mapping[self.arm_y]]
+                x_nav = -self.joy_data.axes[self.axes_mapping[self.arm_x]]
+                y_nav = -self.joy_data.axes[self.axes_mapping[self.arm_y]]
                 # Ceck if mirror is enabled
                 if mirror: 
-                    x_nav = data.axes[self.axes_mapping[self.arm_x]]  
-                    y_nav = data.axes[self.axes_mapping[self.arm_y]]
+                    x_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]]  
+                    y_nav = self.joy_data.axes[self.axes_mapping[self.arm_y]]
             else:
-                x_nav = -data.axes[self.axes_mapping[self.arm_y]]
-                y_nav = data.axes[self.axes_mapping[self.arm_x]]
+                x_nav = -self.joy_data.axes[self.axes_mapping[self.arm_y]]
+                y_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]]
                 if mirror:     
-                    x_nav = data.axes[self.axes_mapping[self.arm_x]] 
-                    y_nav = data.axes[self.axes_mapping[self.arm_y]]
+                    x_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]] 
+                    y_nav = self.joy_data.axes[self.axes_mapping[self.arm_y]]
 
         # Increeses the arm movement with the speed and whitin the boundries  
         pos_x += x_nav * self.arm_speed_control
@@ -209,19 +211,19 @@ class TeleopNode:
         # Check if the LT, RT buttons are initiated
         if self.T_buttons_initiated_:
             # Uses the LT and RT buttons to control the z-axis linearly, more pressed bigger increment
-            pos_z += (1 - data.axes[self.axes_mapping[self.arm_up]]) / 2 * self.arm_speed_control
-            pos_z -= (1 - data.axes[self.axes_mapping[self.arm_down]]) / 2 * self.arm_speed_control
+            pos_z += (1 - self.joy_data.axes[self.axes_mapping[self.arm_up]]) / 2 * self.arm_speed_control
+            pos_z -= (1 - self.joy_data.axes[self.axes_mapping[self.arm_down]]) / 2 * self.arm_speed_control
             pos_z = min(max(pos_z, self.min_z_arm), self.max_z_arm)
 
         # Reset the arm to home position
-        if data.buttons[self.button_mapping[self.home_button]] == 1:
+        if self.evaluate_button(self.home_button):
             pos_x = self.home_position_x
             pos_y = self.home_position_y
             pos_z = self.home_position_z
             rospy.loginfo('Arm reset')
 
         # Reset the arm to end position
-        if data.buttons[self.button_mapping[self.end_button]] == 1:
+        if self.evaluate_button(self.end_button):
             pos_x = self.end_position_x
             pos_y = self.end_position_y
             pos_z = self.end_position_z
@@ -231,30 +233,30 @@ class TeleopNode:
         return pos_x, pos_y, pos_z
 
     # Function for controlling the end effector
-    def end_effector(self, data, M1, M2, mirror=False, left=False):
-        # Controlls for right arm
+    def end_effector(self, M1, M2, mirror=False, left=False):
+        # Controlls for right end effector
         if not left:
             if self.global_frame_point:
-                m1_nav = data.axes[self.axes_mapping[self.endef_up]]
-                m2_nav = -data.axes[self.axes_mapping[self.endef_left]]
+                m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
+                m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
             else:
-                m1_nav = data.axes[self.axes_mapping[self.endef_up]]
-                m2_nav = -data.axes[self.axes_mapping[self.endef_left]]
+                m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
+                m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
 
-        # Controlls for left arm
+        # Controlls for left end effector
         if left:
             if self.global_frame_point:
-                m1_nav = data.axes[self.axes_mapping[self.endef_up]]
-                m2_nav = data.axes[self.axes_mapping[self.endef_left]]
+                m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
+                m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
                 if mirror: 
-                    m1_nav = data.axes[self.axes_mapping[self.endef_up]]
-                    m2_nav = -data.axes[self.axes_mapping[self.endef_left]]
+                    m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
+                    m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
             else:
-                m1_nav = data.axes[self.axes_mapping[self.endef_up]]
-                m2_nav = -data.axes[self.axes_mapping[self.endef_left]]
+                m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
+                m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
                 if mirror:
-                    m1_nav = data.axes[self.axes_mapping[self.endef_up]]
-                    m2_nav = data.axes[self.axes_mapping[self.endef_left]]
+                    m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
+                    m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
 
         # Increasing the values within the limits
         M1 += m1_nav * self.arm_speed_control
@@ -264,7 +266,7 @@ class TeleopNode:
         M2 = min(max(M2, self.min_x_end_effector), self.max_x_end_effector)
 
         # Reset the end effector to home position
-        if data.buttons[self.button_mapping[self.home_button]] == 1:
+        if self.evaluate_button(self.home_button):
             M1 = 90
             M2 = 90
             rospy.loginfo('End effector reset')
@@ -352,6 +354,11 @@ class TeleopNode:
                 if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1 and not self.L3_R3_button_prev_state:
                     self.safety_stop_ = not self.safety_stop_
                     self.safety_stop()
+                    if self.safety_stop_:
+                        rospy.loginfo("Safety Enabled")
+                    else:
+                        rospy.loginfo("Safety Disabled")
+                        
                 if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1:
                     self.L3_R3_button_prev_state = True
                 else:
@@ -362,16 +369,16 @@ class TeleopNode:
                     # Controlles only the arms that are activated
                                     
                     if self.arm1_initiated:
-                        self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(self.joy_data, self.position_x_1, self.position_y_1, self.position_z_1)
+                        self.position_x_1, self.position_y_1, self.position_z_1 = self.controll_arm(self.position_x_1, self.position_y_1, self.position_z_1)
 
                     if self.arm2_initiated:
-                        self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(self.joy_data, self.position_x_2, self.position_y_2, self.position_z_2, self.mirror, left=True)
+                        self.position_x_2, self.position_y_2, self.position_z_2 = self.controll_arm(self.position_x_2, self.position_y_2, self.position_z_2, self.mirror, left=True)
 
                     if self.endeffector1_initiated:
-                        self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(self.joy_data, self.end_effector1_M1, self.end_effector1_M2)
+                        self.end_effector1_M1, self.end_effector1_M2 = self.end_effector(self.end_effector1_M1, self.end_effector1_M2)
 
                     if self.endeffector2_initiated:
-                        self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(self.joy_data, self.end_effector2_M1, self.end_effector2_M2, self.mirror, left=True)
+                        self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(self.end_effector2_M1, self.end_effector2_M2, self.mirror, left=True)
 
                 # Publish only position when controller is used
                 if self.arm1_initiated:

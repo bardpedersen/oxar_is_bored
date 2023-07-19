@@ -29,8 +29,7 @@ button_map: {
 
 # Button actions with corresponding button
 activate_arm_button: button_X
-activate_endef_button: button_xbox
-use_endef: button_Y
+activate_endef_button: button_Y
 
 increase_arm_speed: button_start
 decrease_arm_speed: button_back
@@ -40,13 +39,13 @@ decrease_drive_speed: button_LB
 
 arm_up: axis_LT
 arm_down: axis_RT
-arm_y: axis_Dpad_side
-arm_x: axis_Dpad_up
+arm_y: axis_L_side
+arm_x: axis_L_up
 
 endef_up: axis_Dpad_up
 endef_side: axis_Dpad_side
 
-drive_forward: axis_L_up
+drive_forward: axis_R_up
 drive_turning: axis_R_side
 
 

@@ -30,4 +30,6 @@ This README file provides a visual mapping of every button on an Xbox controller
 
 You can refer to this button mapping diagram when driving thorvald and controlling the arms with the teleop_arm.py
 
+When endeffectors are not active they will follow the arms so that the camera always follows the y-axis (global frame). The tilt will remain from its last setpoint.
+
 **L3** is **Left stick** pressed down, and **R3** is **Right stick** pressed down.
