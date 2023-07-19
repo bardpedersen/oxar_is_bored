@@ -23,6 +23,18 @@ class CameraDisplayNode:
         elif joy_msg.axes[6] == 1:
             # Decrement the camera index
             self.index = (self.index - 1) % len(self.camera_subscribers)
+        
+        # Switch between cameras with mouse
+    def mouse_callback(self, event, x, y, flags, param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            num_cameras = len(self.camera_subscribers)
+            # Calculate the width of each image in the display window
+            image_width = int(self.im_tile_resize.shape[1] / num_cameras)
+            #image_height = int(self.im_tile_resize.shape[0] - image_width)
+            # Determine the index of the clicked image
+            clicked_index = x // image_width
+            if clicked_index < num_cameras: # and y > image_height:
+                self.index = clicked_index
 
     def camera_callback(self, image, camera_index):
         # Convert ROS Image to OpenCV format
@@ -85,34 +97,18 @@ class CameraDisplayNode:
                           for im in im_list]
         return cv2.hconcat(im_list_resize)
 
-    # Switch between cameras with mouse
-    def mouse_callback(self, event, x, y, flags, param):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            num_cameras = len(self.camera_subscribers)
-            # Calculate the width of each image in the display window
-            image_width = int(self.im_tile_resize.shape[1] / num_cameras)
-            #image_height = int(self.im_tile_resize.shape[0] - image_width)
-            # Determine the index of the clicked image
-            clicked_index = x // image_width
-            if clicked_index < num_cameras: # and y > image_height:
-                self.index = clicked_index
-
     # Main loop
     def run(self):
-        rospy.init_node("camera_viewer_node")
-        rospy.loginfo("Camera viewer node has been started")
-        param_name = "camera_topics"
 
         # Wait for the parameter to be set
-        while not rospy.has_param(param_name):
+        while not rospy.has_param("camera_topics"):
             rospy.sleep(1)
             #rospy.loginfo("Waiting for parameters")
 
-        camera_topics = rospy.get_param(param_name)
-        rospy.loginfo("Camera topics: %s", camera_topics)
+        camera_topics = rospy.get_param("camera_topics")
 
         # Create a controller subscriber
-        controller_subscriber = rospy.Subscriber("/joy", Joy, self.joy_callback)
+        rospy.Subscriber("/joy", Joy, self.joy_callback)
 
         # Create camera subscribers and image buffers
         for i, topic in enumerate(camera_topics):
@@ -120,7 +116,9 @@ class CameraDisplayNode:
             subscriber = rospy.Subscriber(topic, Image, self.camera_callback, callback_args=i)
             self.camera_subscribers.append(subscriber)
 
-        rate = rospy.Rate(30)  # Display rate in Hz
+        rate = rospy.Rate(60)  # Display rate in Hz
+        rospy.loginfo("Camera viewer node has been started")
+        rospy.loginfo("Camera topics: %s", camera_topics)
 
         while not rospy.is_shutdown():
             key = cv2.waitKey(1) & 0xFF
@@ -135,8 +133,6 @@ class CameraDisplayNode:
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    try:
-        node = CameraDisplayNode()
-        node.run()
-    except rospy.ROSInterruptException:
-        pass
+    rospy.init_node("camera_viewer_node")
+    Camera_Display_Node = CameraDisplayNode()
+    Camera_Display_Node.run()
