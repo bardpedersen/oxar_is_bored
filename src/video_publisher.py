@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     # Creates video publishers
     for video_channel in video_channels:
-        topic_name = f'video_stream_{video_channel}'
+        topic_name = "video_stream_{}".format(video_channel)
         camera_topics.append(topic_name)
         publishers.append(VideoPublisher(topic_name, video_channel))
     
