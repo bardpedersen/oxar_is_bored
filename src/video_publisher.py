@@ -4,7 +4,7 @@ import cv2
 import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-from std_srvs.srv import Trigger, TriggerResponse
+from std_srvs.srv import Trigger
 
 
 def find_video_channels():
