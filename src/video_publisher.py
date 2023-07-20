@@ -28,6 +28,8 @@ class VideoPublisher:
         self.bridge = CvBridge()
         self.publisher = rospy.Publisher(topic_name, Image, queue_size=10)
         self.video_capture = cv2.VideoCapture(self.video_channel)
+        #self.video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320) # May be needed for mutliple cameras from same port
+        #self.video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240) ¤ May be needed for mutliple cameras from same port
 
 
     def publish_frame(self):

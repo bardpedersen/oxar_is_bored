@@ -8,8 +8,8 @@ from cv_bridge import CvBridge
 
 class CameraDisplayNode:
     def __init__(self):
-        self.camera_subscribers = []
         self.images = []
+        self.valid_images = []
         self.cv_bridge = CvBridge()
         self.index = 0
         self.window_name = "Camera Display"
@@ -19,22 +19,23 @@ class CameraDisplayNode:
         # Check if the dpad left and right is pressed
         if joy_msg.axes[6] == -1:
             # Increment the camera index
-            self.index = (self.index + 1) % len(self.camera_subscribers)
+            self.index = (self.index + 1) % len(self.valid_images)
         elif joy_msg.axes[6] == 1:
             # Decrement the camera index
-            self.index = (self.index - 1) % len(self.camera_subscribers)
+            self.index = (self.index - 1) % len(self.valid_images)
         
         # Switch between cameras with mouse
     def mouse_callback(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
-            num_cameras = len(self.camera_subscribers)
+            num_cameras = len(self.valid_images)
             # Calculate the width of each image in the display window
             image_width = int(self.im_tile_resize.shape[1] / num_cameras)
-            #image_height = int(self.im_tile_resize.shape[0] - image_width)
+            image_height = int(self.im_tile_resize.shape[0] - image_width*0.75)
             # Determine the index of the clicked image
             clicked_index = x // image_width
-            if clicked_index < num_cameras: # and y > image_height:
+            if clicked_index < num_cameras and y > image_height:
                 self.index = clicked_index
+            rospy.loginfo("Clicked on camera %d", self.index + 1)
 
     def camera_callback(self, image, camera_index):
         # Convert ROS Image to OpenCV format
@@ -47,30 +48,32 @@ class CameraDisplayNode:
 
     def display_images(self):
         # Filter out None values (invalid images)
-        valid_images = [image for image in self.images if image is not None]
+        self.valid_images = [image for image in self.images if image is not None]
 
         # Concatenate valid images side by side
-        if valid_images:
+        if self.valid_images:
             # Display the combined image
-            if len(valid_images) == 1:
-                self.im_tile_resize = valid_images[0]
+            if len(self.valid_images) == 1:
+                self.im_tile_resize = self.valid_images[0]
             else:
-                self.im_tile_resize = self.concat_tile_resize([[valid_images[self.index]], valid_images])
+                self.im_tile_resize = self.concat_tile_resize([[self.valid_images[self.index]], self.valid_images])
 
             # Add camera number text to each image
-            num_cameras = len(self.camera_subscribers)
+            
+            num_cameras = len(self.valid_images)
             image_width = int(self.im_tile_resize.shape[1] / num_cameras)
+            image_height = int(self.im_tile_resize.shape[0] - image_width*0.75)
             for i in range(num_cameras):
                 x = i * image_width + 5
-                y = 525 # Need to define better
+                y = image_height + 25
                 text = "Camera {}".format(i + 1)
-                cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 1)
+                cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2/num_cameras, (0, 0, 0), int(2/num_cameras))
 
                 if i == self.index:
                     x = 25 # Need to define better
-                    y = 75 # --""--
+                    y = 75 # Need to define better
                     cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1)
-
+            
             # Show the combined image in full screen
             cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
             cv2.setWindowProperty(self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
@@ -113,9 +116,8 @@ class CameraDisplayNode:
         # Create camera subscribers and image buffers
         for i, topic in enumerate(camera_topics):
             self.images.append(None)
-            subscriber = rospy.Subscriber(topic, Image, self.camera_callback, callback_args=i)
-            self.camera_subscribers.append(subscriber)
-
+            rospy.Subscriber(topic, Image, self.camera_callback, callback_args=i)
+        
         rate = rospy.Rate(60)  # Display rate in Hz
         rospy.loginfo("Camera viewer node has been started")
         rospy.loginfo("Camera topics: %s", camera_topics)

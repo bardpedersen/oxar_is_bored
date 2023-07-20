@@ -1,10 +1,10 @@
 <launch>
 
    <!-- Finds the cameras -->
-   <node pkg="oxar_is_bored" type="video_finder.py" name="video_finder"></node>
+   <node pkg="oxar_is_bored" type="video_finder.py" name="video_finder"/>
    <!-- Creats topics and publishers for each camera  -->
-   <node pkg="oxar_is_bored" type="video_publisher.py" name="video_publisher"></node>
+   <node pkg="oxar_is_bored" type="video_publisher.py" name="video_publisher"/>
    <!-- Visualize each video topic  -->
-   <node pkg="oxar_is_bored" type="camera_viewer.py" name="camera_viewer" output="screen"></node>
+   <node pkg="oxar_is_bored" type="camera_viewer.py" name="camera_viewer" output="screen"/>
    
 </launch>
