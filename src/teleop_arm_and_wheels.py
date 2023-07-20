@@ -319,9 +319,7 @@ class TeleopNode:
                     # Changes only when x button is pressed, not hold down
                     # Switches between left and right arm
                 if self.evaluate_button(self.activate_arm_button):
-                    self.arm_initiated += 1
-                    if self.arm_initiated == 4:
-                        self.arm_initiated = 0
+                    self.arm_initiated = (self.arm_initiated + 1) % 4
 
                     if self.arm_initiated == 0:
                         rospy.loginfo("No arm activated")
@@ -334,9 +332,7 @@ class TeleopNode:
                 
                 # Switches between left and right end effector
                 if self.evaluate_button(self.activate_endef_button):
-                    self.endeffector_initiated += 1
-                    if self.endeffector_initiated == 4:
-                        self.endeffector_initiated = 0
+                    self.endeffector_initiated = (self.endeffector_initiated + 1) % 4
                     
                     if self.endeffector_initiated == 0:
                         rospy.loginfo("No end effector activated")
