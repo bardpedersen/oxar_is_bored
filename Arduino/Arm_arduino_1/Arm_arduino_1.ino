@@ -5,8 +5,8 @@
 Servo servo1;
 Servo servo2;
 
-int servo1Pin = 3;  // Change to the pin connected to servo 1
-int servo2Pin = 4; // Change to the pin connected to servo 2
+int servo1Pin = 4;  // Change to the pin connected to servo 1
+int servo2Pin = 3; // Change to the pin connected to servo 2
 
 ros::NodeHandle nh;
 std_msgs::Int32MultiArray jointAngles;

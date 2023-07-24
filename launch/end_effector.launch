@@ -11,4 +11,4 @@
     <param name="baud" value="115200"/>
   </node>
 
-<launch/>
+</launch>

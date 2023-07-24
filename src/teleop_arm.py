@@ -124,14 +124,14 @@ class TeleopNode:
 
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
-        if not self.arm1_initiated:
+        if not self.arm1_initiated or self.safety_stop_:
             for pose in data.poses:
                 self.position_x_1 = pose.position.x
                 self.position_y_1 = pose.position.y
                 self.position_z_1 = pose.position.z
 
     def arm_pos2_callback(self, data):
-        if not self.arm2_initiated:
+        if not self.arm2_initiated or self.safety_stop_:
             for pose in data.poses:
                 self.position_x_2 = pose.position.x
                 self.position_y_2 = pose.position.y
@@ -139,12 +139,12 @@ class TeleopNode:
 
     def arm_endef_angle1(self, data):
         if not self.endeffector1_initiated:
-            self.end_effector1_M2 = min(max(np.degrees(data.data[0]), self.min_x_end_effector), self.max_x_end_effector)
+            self.end_effector1_M2 = 180 - min(max(np.degrees(data.data[0]), self.min_x_end_effector), self.max_x_end_effector)
 
 
     def arm_endef_angle2(self, data):
         if not self.endeffector2_initiated:
-            self.end_effector2_M2 = min(max(np.degrees(data.data[0]), self.min_x_end_effector), self.max_x_end_effector)
+            self.end_effector2_M2 = 180 - min(max(np.degrees(data.data[0]), self.min_x_end_effector), self.max_x_end_effector)
 
 
     # Calls safety stop service to stop arms
@@ -238,19 +238,19 @@ class TeleopNode:
         if not left:
             if self.global_frame_point:
                 m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
-                m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
+                m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
             else:
                 m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
-                m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
+                m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
 
         # Controlls for left end effector
         if left:
             if self.global_frame_point:
                 m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
-                m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
+                m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
                 if mirror: 
                     m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
-                    m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
+                    m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
             else:
                 m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
                 m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
