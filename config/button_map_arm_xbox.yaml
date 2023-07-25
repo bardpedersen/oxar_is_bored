@@ -47,6 +47,7 @@ frame_change: button_A
 home_button: button_B
 end_button: button_xbox
 mirror_button: button_R3
+away_button: button_L3
 
 safety_stop_button: [button_L3, button_R3]
 

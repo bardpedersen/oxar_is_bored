@@ -5,7 +5,7 @@ import rospy
 from sensor_msgs.msg import Joy
 from std_srvs.srv import SetBool, SetBoolRequest
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Int32MultiArray, Float32MultiArray
+from std_msgs.msg import Int32MultiArray, Float32MultiArray, Bool
 from geometry_msgs.msg import PoseArray
 
 class TeleopNode:
@@ -32,6 +32,7 @@ class TeleopNode:
         self.home_button = rospy.get_param('home_button')
         self.end_button = rospy.get_param('end_button')
         self.mirror_button = rospy.get_param('mirror_button')
+        self.away_button_ = rospy.get_param('away_button')
         self.safety_stop_button = rospy.get_param('safety_stop_button')
 
         # Get the restrictions from the parameter server
@@ -69,6 +70,7 @@ class TeleopNode:
         self.L3_R3_button_prev_state = False
         self.mirror = False
         self.safety_stop_= False
+        self.away_button = False
         self.previous_button_pressed = [0] * len(self.button_mapping)
 
         # Variables for storing arm positions
@@ -97,6 +99,9 @@ class TeleopNode:
         # Create publisher for the arm controller topic
         self.arm_posit_pub1 = rospy.Publisher('arm1position', JointState, queue_size=10)
         self.arm_posit_pub2 = rospy.Publisher('arm2position', JointState, queue_size=10)
+
+        self.arm_away_position1 = rospy.Publisher('arm1_calib_stretched_cmd', Bool, queue_size=10)
+        self.arm_away_position2 = rospy.Publisher('arm2_calib_stretched_cmd', Bool, queue_size=10)
 
         # Create publisher for the end effector controller topic
         self.end_effector_pub1 = rospy.Publisher('endeffector1', Int32MultiArray, queue_size=10)
@@ -146,6 +151,24 @@ class TeleopNode:
         if not self.endeffector2_initiated:
             self.end_effector2_M2 = 180 - min(max(np.degrees(data.data[0]), self.min_x_end_effector), self.max_x_end_effector)
 
+    """  Problems with arduino """
+    """
+    def endef_away1(self):
+        n = self.end_effector1_M1
+        while n > 0:
+            array1 = Int32MultiArray()
+            array1.data = [int(n), int(n)]
+            self.end_effector_pub1.publish(array1)
+            n-=1
+    
+    def endef_away2(self):
+        n = self.end_effector2_M1
+        while n > 0:
+            array2 = Int32MultiArray()
+            array2.data = [int(n), int(n)]
+            self.end_effector_pub2.publish(array2)
+            n-=1
+    """
 
     # Calls safety stop service to stop arms
     def safety_stop(self):
@@ -175,6 +198,23 @@ class TeleopNode:
     # Function for controlling the arms
     def controll_arm(self, pos_x, pos_y, pos_z, mirror=False, left=False):   
 
+        # Reset the arm to home position
+        if self.evaluate_button(self.home_button):
+            pos_x = self.home_position_x
+            pos_y = self.home_position_y
+            pos_z = self.home_position_z
+            rospy.loginfo('Arm reset')
+            return pos_x, pos_y, pos_z
+
+        # Reset the arm to end position
+        if self.evaluate_button(self.end_button):
+            if not self.away_button:
+                pos_x = self.end_position_x
+                pos_y = self.end_position_y
+                pos_z = self.end_position_z
+                rospy.loginfo('Arm ready position')
+                return pos_x, pos_y, pos_z
+            
         # Controlls for right arm
         if not left:
             # Check if the global frame is enabled
@@ -215,25 +255,29 @@ class TeleopNode:
             pos_z -= (1 - self.joy_data.axes[self.axes_mapping[self.arm_down]]) / 2 * self.arm_speed_control
             pos_z = min(max(pos_z, self.min_z_arm), self.max_z_arm)
 
-        # Reset the arm to home position
-        if self.evaluate_button(self.home_button):
-            pos_x = self.home_position_x
-            pos_y = self.home_position_y
-            pos_z = self.home_position_z
-            rospy.loginfo('Arm reset')
-
-        # Reset the arm to end position
-        if self.evaluate_button(self.end_button):
-            pos_x = self.end_position_x
-            pos_y = self.end_position_y
-            pos_z = self.end_position_z
-            rospy.loginfo('Arm end position')
-
         # Returns the updated varibals so it can be stored
         return pos_x, pos_y, pos_z
 
     # Function for controlling the end effector
     def end_effector(self, M1, M2, mirror=False, left=False):
+        # Reset the end effector to home position
+        if self.evaluate_button(self.home_button):
+            M1 = 90
+            M2 = 90
+            rospy.loginfo('End effector reset')
+            return M1, M2 
+        
+        """
+        if self.evaluate_button(self.end_button):
+            if self.away_button:
+                if left:
+                    self.endef_away2()
+                else:
+                    self.endef_away1()
+                rospy.loginfo('End effector awa position')
+                return M1, M2
+        """
+        
         # Controlls for right end effector
         if not left:
             if self.global_frame_point:
@@ -264,12 +308,6 @@ class TeleopNode:
 
         M2 += m2_nav * self.arm_speed_control
         M2 = min(max(M2, self.min_x_end_effector), self.max_x_end_effector)
-
-        # Reset the end effector to home position
-        if self.evaluate_button(self.home_button):
-            M1 = 90
-            M2 = 90
-            rospy.loginfo('End effector reset')
 
         # Returns the updated varibals so it can be stored
         return M1, M2
@@ -339,6 +377,24 @@ class TeleopNode:
                     elif not self.mirror:
                         rospy.loginfo('Mirror disabled')
 
+                if self.evaluate_button(self.away_button_):
+                    self.away_button = not self.away_button
+                    if self.away_button:
+                        rospy.loginfo('Away button enabled')
+                    elif not self.away_button:
+                        rospy.loginfo('Ready button enabled')
+                
+                """ Not workin propperly
+                if self.evaluate_button(self.end_button):
+                    if self.away_button:
+                        # Publish to tuck arm  away
+                        self.arm_away_position1.publish(True)
+                        self.arm_away_position2.publish(True)
+                        rospy.loginfo('Arm away position')
+
+                """
+                    
+
                 # Adjust the speed of the arms and end effectors
                 if self.evaluate_button(self.increase_arm_speed):
                     self.arm_speed_control += 0.1
@@ -381,27 +437,27 @@ class TeleopNode:
                         self.end_effector2_M1, self.end_effector2_M2 = self.end_effector(self.end_effector2_M1, self.end_effector2_M2, self.mirror, left=True)
 
                 # Publish only position when controller is used
-                if self.arm1_initiated:
+                if self.arm1_initiated and not self.away_button:
                     joint_state = JointState()
                     joint_state.position = [self.position_x_1, self.position_y_1, self.position_z_1]
                     joint_state.velocity = [0.0]
                     joint_state.effort = [0]
                     self.arm_posit_pub1.publish(joint_state)
 
-                if self.arm2_initiated:
+                if self.arm2_initiated and not self.away_button:
                     joint_state = JointState()
                     joint_state.position = [self.position_x_2, self.position_y_2, self.position_z_2]
                     joint_state.velocity = [0.0]
                     joint_state.effort = [0]
                     self.arm_posit_pub2.publish(joint_state)
 
-                array = Int32MultiArray()
-                array.data = [int(self.end_effector1_M1), int(self.end_effector1_M2)]
-                self.end_effector_pub1.publish(array)
+                array1 = Int32MultiArray()
+                array1.data = [int(self.end_effector1_M1), int(self.end_effector1_M2)]
+                self.end_effector_pub1.publish(array1)
 
-                array = Int32MultiArray()
-                array.data = [int(self.end_effector2_M1), int(self.end_effector2_M2)]
-                self.end_effector_pub2.publish(array)
+                array2 = Int32MultiArray()
+                array2.data = [int(self.end_effector2_M1), int(self.end_effector2_M2)]
+                self.end_effector_pub2.publish(array2)
 
                 # stores wich button is being held down
                 self.previous_button_pressed = self.joy_data.buttons
@@ -416,3 +472,8 @@ if __name__ == '__main__':
 
     # Keep script running
     Teleop_Node.run()
+
+"""
+Add a record function. Press a button and it records its movement untill the button is pressed again. 
+When annother button is pressed it will move from the recording.
+"""
