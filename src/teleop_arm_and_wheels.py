@@ -113,22 +113,22 @@ class TeleopNode:
 
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
-        if not self.arm1_initiated or self.safety_stop_ or self.away_statement!=0:
+        if self.arm_initiated == 0 or self.arm_initiated == 2  or self.safety_stop_ or self.away_statement!=0:
             pose = data.poses[0].position
             self.armposition_1 = np.array([pose.x, pose.y, pose.z])
 
     def arm_pos2_callback(self, data):
-        if not self.arm2_initiated or self.safety_stop_ or self.away_statement!=0:
+        if self.arm_initiated == 0 or self.arm_initiated == 1 or self.safety_stop_ or self.away_statement!=0:
             pose = data.poses[0].position
             self.armposition_2 = np.array([pose.x, pose.y, pose.z]) 
 
     def arm_endef_angle1(self, data):
-        if not self.endeffector1_initiated:
+        if self.endeffector_initiated == 0 or self.endeffector_initiated == 2:
             angles = np.degrees(data.data)
             self.end_effector1_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector, self.max_x_end_effector)
 
     def arm_endef_angle2(self, data):
-        if not self.endeffector2_initiated:
+        if self.endeffector_initiated == 0 or self.endeffector_initiated == 1:
             angles = np.degrees(data.data)
             self.end_effector2_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector, self.max_x_end_effector)
 
