@@ -27,12 +27,16 @@ class TeleopNode:
         self.L3_R3_button_prev_state = False
         self.mirror = False
         self.safety_stop_= False
+        self.active_sinusodal = False
+        self.sinus_forward = True
+        self.sinus_x_number = 0
         self.away_statement = 0
         self.previous_button_pressed = [0] * len(self.button_mapping)
         self.arm_speed_control = 2
         self.joy_data = None
+        self.pose1 = None
+        self.pose2 = None
 
-        rospy.init_node('teleop_node_arms')
         self.rate = rospy.Rate(60)
 
         self.arm_posit_pub1 = rospy.Publisher('arm1position', JointState, queue_size=10)
@@ -109,17 +113,20 @@ class TeleopNode:
         self.end_position_y = rospy.get_param('end_position_y')
         self.end_position_z = rospy.get_param('end_position_z')
 
+        # List of positions to move
+        self.arm_movement = rospy.get_param('arm_movement')
+
 
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
-        if not self.arm1_initiated or self.safety_stop_ or self.away_statement!=0:
-            pose = data.poses[0].position
-            self.armposition_1 = np.array([pose.x, pose.y, pose.z])
+        self.pose1 = data.poses[0].position
+        if not self.arm1_initiated and not self.safety_stop_ and self.away_statement!=3 and self.away_statement!=4:
+            self.armposition_1 = np.array([self.pose1.x, self.pose1.y, self.pose1.z])
 
     def arm_pos2_callback(self, data):
-        if not self.arm2_initiated or self.safety_stop_ or self.away_statement!=0:
-            pose = data.poses[0].position
-            self.armposition_2 = np.array([pose.x, pose.y, pose.z]) 
+        self.pose2 = data.poses[0].position
+        if not self.arm2_initiated and not self.safety_stop_ and self.away_statement!=3 and self.away_statement!=4:
+            self.armposition_2 = np.array([self.pose2.x, self.pose2.y, self.pose2.z]) 
 
     def arm_endef_angle1(self, data):
         if not self.endeffector1_initiated:
@@ -214,6 +221,66 @@ class TeleopNode:
         # Returns the updated varibals so it can be stored
         return pos
     
+
+    def are_lists_close(self, list1, list2, tolerance=10):
+        if abs(list1.x - list2[0]) > tolerance:
+            return True
+        if abs(list1.y - list2[1]) > tolerance:
+            return True
+        if abs(list1.z - list2[2]) > tolerance:
+            return True
+        else:
+            return False
+
+
+    def move_arm(self, left=False): 
+        for i in self.arm_movement:
+            
+            if not left:
+                self.armposition_1[0] = i[0] 
+                self.armposition_1[1] = i[1] 
+                self.armposition_1[2] = i[2] 
+
+                joint_state = JointState()
+                joint_state.position = self.armposition_1
+                joint_state.velocity = [0.0]
+                joint_state.effort = [0]
+                self.arm_posit_pub1.publish(joint_state)
+                
+                while self.are_lists_close(self.pose1, i):
+                    pass
+                
+            if left:
+                self.armposition_2[0] = i[0] 
+                self.armposition_2[1] = i[1] 
+                self.armposition_2[2] = i[2]
+
+                joint_state = JointState()
+                joint_state.position = self.armposition_2
+                joint_state.velocity = [0.0]
+                joint_state.effort = [0]
+                self.arm_posit_pub2.publish(joint_state)
+                
+                while self.are_lists_close(self.pose2, i):
+                    pass
+
+        rospy.loginfo('Done moving')
+
+    def move_arm_sinusodial(self, pos):
+        if self.sinus_forward:
+            self.sinus_x_number += 1
+        if not self.sinus_forward:
+            self.sinus_x_number -= 1
+
+        if self.sinus_x_number > 279:
+            self.sinus_forward = False
+
+        if self.sinus_x_number < -299:
+            self.sinus_forward = True
+
+        pos[0] = self.sinus_x_number
+        pos[1] = 300 
+        return pos
 
     # Function for controlling the end effector
     def end_effector(self, angle, mirror=False, left=False):
@@ -311,13 +378,17 @@ class TeleopNode:
                     rospy.loginfo('Mirror ' + ('enabled' if self.mirror else 'disabled'))
 
                 if self.evaluate_button(self.away_button):
-                    self.away_statement = (self.away_statement + 1) % 3
+                    self.away_statement = (self.away_statement + 1) % 5
                     if self.away_statement == 0:
                         rospy.loginfo("Status: Free")
                     elif self.away_statement == 1:
                         rospy.loginfo("Status: Calibration")
                     elif self.away_statement == 2:
                         rospy.loginfo("Status: Away")
+                    elif self.away_statement == 3:
+                        rospy.loginfo("Status: Move preset")
+                    elif self.away_statement == 4:
+                        rospy.loginfo("Status: Move sinusodial")
                     else:
                         rospy.logwarn("Unknown status value: {}".format(self.away_statement))
 
@@ -340,6 +411,19 @@ class TeleopNode:
                         if self.arm2_initiated:
                             self.arm_away_position2.publish(True)
                             rospy.loginfo('Arm 2 away position')
+
+                    elif self.away_statement==3:
+                        if self.arm1_initiated:
+                            rospy.loginfo('Arm 1 prevmove')
+                            self.move_arm()
+                        if self.arm2_initiated:
+                            rospy.loginfo('Arm 2 prevmove')
+                            self.move_arm(left=True)
+                    
+                    elif self.away_statement==4:
+                        self.active_sinusodal = not self.active_sinusodal
+                        rospy.loginfo('Sinusodial ' + ('enabled' if self.active_sinusodal else 'disabled'))
+
                                  
                 # Adjust the speed of the arms and end effectors
                 if self.evaluate_button(self.increase_arm_speed):
@@ -367,10 +451,10 @@ class TeleopNode:
                     # Will not publish data when safety stop is enabled
                     # Controlles only the arms that are activated
                                     
-                    if self.arm1_initiated:
+                    if self.arm1_initiated and self.away_statement==0:
                         self.armposition_1 = self.controll_arm(self.armposition_1)
 
-                    if self.arm2_initiated:
+                    if self.arm2_initiated and self.away_statement==0:
                         self.armposition_2 = self.controll_arm(self.armposition_2, self.mirror, left=True)
 
                     if self.endeffector1_initiated:
@@ -379,15 +463,21 @@ class TeleopNode:
                     if self.endeffector2_initiated:
                         self.end_effector2_angles = self.end_effector(self.end_effector2_angles, self.mirror, left=True)
 
+                    if self.arm1_initiated and self.active_sinusodal:
+                        self.armposition_1 = self.move_arm_sinusodial(self.armposition_1)
+                    
+                    if self.arm2_initiated and self.active_sinusodal:
+                        self.armposition_2 = self.move_arm_sinusodial(self.armposition_2)
+
                     # Publish only position when controller is used
-                    if self.arm1_initiated and self.away_statement==0:
+                    if self.arm1_initiated and (self.away_statement==0 or self.away_statement==4):
                         joint_state = JointState()
                         joint_state.position = self.armposition_1
                         joint_state.velocity = [0.0]
                         joint_state.effort = [0]
                         self.arm_posit_pub1.publish(joint_state)
 
-                    if self.arm2_initiated and self.away_statement==0:
+                    if self.arm2_initiated and (self.away_statement==0 or self.away_statement==4):
                         joint_state = JointState()
                         joint_state.position = self.armposition_2
                         joint_state.velocity = [0.0]
@@ -409,6 +499,7 @@ class TeleopNode:
 
 if __name__ == '__main__':
     # Initialize the ROS node
+    rospy.init_node('teleop_node_arms')
     Teleop_Node = TeleopNode()
     Teleop_Node.run()
 

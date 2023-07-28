@@ -23,3 +23,5 @@ home_position_z: 300
 end_position_x: 0
 end_position_y: 200
 end_position_z: 500
+
+arm_movement: [[0, 200, 300],[0, 200, 400],[0, 200, 500],[0, 200, 200],[100, 200, 400]]
