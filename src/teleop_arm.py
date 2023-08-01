@@ -125,12 +125,12 @@ class TeleopNode:
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
         self.pose1 = data.poses[0].position
-        if not self.arm1_initiated and not self.safety_stop_ and self.away_statement!=3 and self.away_statement!=4:
+        if not self.arm1_initiated and not self.safety_stop_ and self.away_statement!=3 and self.away_statement!=4 and self.away_statement!=5:
             self.armposition_1 = np.array([self.pose1.x, self.pose1.y, self.pose1.z])
 
     def arm_pos2_callback(self, data):
         self.pose2 = data.poses[0].position
-        if not self.arm2_initiated and not self.safety_stop_ and self.away_statement!=3 and self.away_statement!=4:
+        if not self.arm2_initiated and not self.safety_stop_ and self.away_statement!=3 and self.away_statement!=4 and self.away_statement!=5:
             self.armposition_2 = np.array([self.pose2.x, self.pose2.y, self.pose2.z]) 
 
     def arm_endef_angle1(self, data):
@@ -238,10 +238,10 @@ class TeleopNode:
             return False
 
 
-    def move_arm(self, left=False): 
+    def move_arm(self, left=0): 
         for i in self.arm_movement:
             
-            if not left:
+            if left==0:
                 self.armposition_1[0] = i[0] 
                 self.armposition_1[1] = i[1] 
                 self.armposition_1[2] = i[2] 
@@ -255,7 +255,7 @@ class TeleopNode:
                 while self.are_lists_close(self.pose1, i):
                     pass
                 
-            if left:
+            if left==1:
                 self.armposition_2[0] = i[0] 
                 self.armposition_2[1] = i[1] 
                 self.armposition_2[2] = i[2]
@@ -269,6 +269,31 @@ class TeleopNode:
                 while self.are_lists_close(self.pose2, i):
                     pass
 
+            if left==2:
+                self.armposition_1[0] = i[0] 
+                self.armposition_1[1] = i[1] 
+                self.armposition_1[2] = i[2]
+
+                self.armposition_2[0] = i[0] 
+                self.armposition_2[1] = i[1] 
+                self.armposition_2[2] = i[2]
+
+                joint_state = JointState()
+                joint_state.position = self.armposition_1
+                joint_state.velocity = [0.0]
+                joint_state.effort = [0]
+                self.arm_posit_pub1.publish(joint_state)
+                
+
+                joint_state = JointState()
+                joint_state.position = self.armposition_2
+                joint_state.velocity = [0.0]
+                joint_state.effort = [0]
+                self.arm_posit_pub2.publish(joint_state)
+                
+                while self.are_lists_close(self.pose2, i) or self.are_lists_close(self.pose1, i):
+                    pass
+
         rospy.loginfo('Done moving')
 
     def move_arm_sinusodial(self, pos):
@@ -277,14 +302,14 @@ class TeleopNode:
         if not self.sinus_forward:
             self.sinus_x_number -= 1
 
-        if self.sinus_x_number > 279:
+        if self.sinus_x_number > 250:
             self.sinus_forward = False
 
-        if self.sinus_x_number < -299:
+        if self.sinus_x_number < -150:
             self.sinus_forward = True
 
         pos[0] = self.sinus_x_number
-        pos[1] = 300 
+        pos[1] = 200 
         return pos
     
     def move_arm_cosinusodial(self, pos):
@@ -305,10 +330,10 @@ class TeleopNode:
             self.cosinus_forward = True
         
         if self.cosinus_z_number > 399:
-            self.cosinus_upward = False
+            self.cosinus_upward = True
 
         if self.cosinus_z_number < 99:
-            self.cosinus_upward = True
+            self.cosinus_upward = False
 
         pos[0] = self.cosinus_x_number
         pos[1] = 300 
@@ -428,32 +453,36 @@ class TeleopNode:
                         rospy.logwarn("Unknown status value: {}".format(self.away_statement))
 
                 if self.evaluate_button(self.end_button):
-                    if self.arm1_initiated and self.arm2_initiated:
-                        rospy.loginfo("Calibrate one arm at a time")
-
-                    elif self.away_statement==1:
-                        if self.arm1_initiated:
+                    if self.away_statement==1:
+                        if self.arm1_initiated and self.arm2_initiated:
+                            rospy.loginfo("Calibrate one arm at a time")
+                        elif self.arm1_initiated:
                             self.arm1_calib.publish(True)
                             rospy.loginfo('Arm 1 calibrating')
-                        if self.arm2_initiated:
+                        elif self.arm2_initiated:
                             self.arm2_calib.publish(True)
                             rospy.loginfo('Arm 2 calibrating')
-        
+
                     elif self.away_statement==2:
-                        if self.arm1_initiated:
+                        if self.arm1_initiated and self.arm2_initiated:
+                            rospy.loginfo("Put one arm away at a time")
+                        elif self.arm1_initiated:
                             self.arm_away_position1.publish(True)
                             rospy.loginfo('Arm 1 away position')
-                        if self.arm2_initiated:
+                        elif self.arm2_initiated:
                             self.arm_away_position2.publish(True)
                             rospy.loginfo('Arm 2 away position')
 
-                    elif self.away_statement==3:
-                        if self.arm1_initiated:
+                    elif self.away_statement==3: 
+                        if self.arm1_initiated and self.arm2_initiated:
+                            rospy.loginfo('Arm 1 and 2 prevmove')
+                            self.move_arm(left=2)                           
+                        elif self.arm1_initiated:
                             rospy.loginfo('Arm 1 prevmove')
                             self.move_arm()
-                        if self.arm2_initiated:
+                        elif self.arm2_initiated:
                             rospy.loginfo('Arm 2 prevmove')
-                            self.move_arm(left=True)
+                            self.move_arm(left=1)
                     
                     elif self.away_statement==4:
                         self.active_sinusodal = not self.active_sinusodal
@@ -468,12 +497,12 @@ class TeleopNode:
                 if self.evaluate_button(self.increase_arm_speed):
                     self.arm_speed_control += 0.1
                     self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed, self.arm_max_speed)
-                    rospy.loginfo(self.arm_speed_control)
+                    rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
                 if self.evaluate_button(self.decrease_arm_speed):
                     self.arm_speed_control -= 0.1
                     self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed, self.arm_max_speed)
-                    rospy.loginfo(self.arm_speed_control)
+                    rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
                 # Activates the emergency stop 
                 if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1 and not self.L3_R3_button_prev_state:
@@ -515,14 +544,14 @@ class TeleopNode:
                         self.armposition_2 = self.move_arm_cosinusodial(self.armposition_2)
 
                     # Publish only position when controller is used
-                    if self.arm1_initiated and (self.away_statement==0 or self.away_statement==4):
+                    if self.arm1_initiated and (self.away_statement==0 or self.away_statement==4 or self.away_statement==5):
                         joint_state = JointState()
                         joint_state.position = self.armposition_1
                         joint_state.velocity = [0.0]
                         joint_state.effort = [0]
                         self.arm_posit_pub1.publish(joint_state)
 
-                    if self.arm2_initiated and (self.away_statement==0 or self.away_statement==4):
+                    if self.arm2_initiated and (self.away_statement==0 or self.away_statement==4 or self.away_statement==5):
                         joint_state = JointState()
                         joint_state.position = self.armposition_2
                         joint_state.velocity = [0.0]
@@ -553,9 +582,8 @@ Add a record function. Press a button and it records its movement untill the but
 When annother button is pressed it will move from the recording.
 
 Arms are lagging
-
+Can co both sinus and cosin at same time. remove.
 Endeffector error if moved to fast
-
-
+Safety always wokring?
 Calibration at the same time, error
 """

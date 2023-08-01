@@ -24,6 +24,6 @@
   </node>  
 
   <!--Launch both the end effectors from launch file-->
-  <include file="$(find oxar_is_bored)/launch/end_effector.launch" />
+  <!--include file="$(find oxar_is_bored)/launch/end_effector.launch" /-->
 
 </launch>

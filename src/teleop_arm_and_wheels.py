@@ -113,12 +113,12 @@ class TeleopNode:
 
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
-        if self.arm_initiated == 0 or self.arm_initiated == 2  or self.safety_stop_ or self.away_statement!=0:
+        if self.arm_initiated == 0 or self.arm_initiated == 2  or self.safety_stop_:
             pose = data.poses[0].position
             self.armposition_1 = np.array([pose.x, pose.y, pose.z])
 
     def arm_pos2_callback(self, data):
-        if self.arm_initiated == 0 or self.arm_initiated == 1 or self.safety_stop_ or self.away_statement!=0:
+        if self.arm_initiated == 0 or self.arm_initiated == 1 or self.safety_stop_:
             pose = data.poses[0].position
             self.armposition_2 = np.array([pose.x, pose.y, pose.z]) 
 
@@ -174,31 +174,11 @@ class TeleopNode:
         try:
             response = self.home_steering_service(trigger_req)
             if response.success:
-                rospy.loginfo('Safety stop successfully!')
+                rospy.loginfo('Home steering called successfully!')
             else:
-                rospy.logwarn('Failed to safety stop.')
+                rospy.logwarn('Failed call home steering.')
         except rospy.ServiceException as e:
             rospy.logerr('Service call failed: ' + str(e))
-
-
-    def driving(self):
-        twist = Twist()
-        twist.linear.x = self.joy_data.axes[self.axes_mapping[self.drive_forward]] * self.speed_controll
-        twist.angular.z = self.joy_data.axes[self.axes_mapping[self.drive_turning]] * self.speed_controll 
-        self.cmd_vel_pub.publish(twist)
-
-
-    # Function for driving the robot
-    def driving_speed(self):
-
-        # Adjust the speed of the robot
-        if self.evaluate_button(self.increase_drive_speed):
-            self.speed_controll += 0.1
-            self.speed_controll = np.clip(self.speed_controll, self.drive_max_speed, self.drive_min_speed)
-        
-        if self.evaluate_button(self.decrease_drive_speed):
-            self.speed_controll -= 0.1
-            self.speed_controll = np.clip(self.speed_controll, self.drive_max_speed, self.drive_min_speed)
 
 
     # Function for controlling the arms
@@ -216,13 +196,14 @@ class TeleopNode:
             return pos
         
         # Controlls for right arm
+                # Controlls for right arm
         if not left:
             x_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]]
             y_nav = self.joy_data.axes[self.axes_mapping[self.arm_y]]
 
         # Controlls for left arm
         if left:
-            x_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]]
+            x_nav = -self.joy_data.axes[self.axes_mapping[self.arm_x]]
             y_nav = -self.joy_data.axes[self.axes_mapping[self.arm_y]]
 
         # Increasing the values within the limits
@@ -248,26 +229,26 @@ class TeleopNode:
         # Reset the end effector to home position
         if self.evaluate_button(self.home_button):
             angle[0] = 90
-            angle[0] = 90
+            angle[1] = 90
             rospy.loginfo('End effector reset')
             return angle
         
         # Controlls for right end effector
         if not left:
-            m1_nav = -self.joy_data.axes[self.axes_mapping[self.endef_up]]
-            m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
+            m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
+            m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
 
         # Controlls for left end effector
         if left:
-            m1_nav = -self.joy_data.axes[self.axes_mapping[self.endef_up]]
+            m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
             m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
 
         # Increasing the values within the limits
         angle[0] += m1_nav * self.arm_speed_control
         angle[0] = np.clip(angle[0], self.min_x_end_effector, self.max_x_end_effector)
 
-        angle[0] += m2_nav * self.arm_speed_control
-        angle[0] = np.clip(angle[0], self.min_x_end_effector, self.max_x_end_effector)
+        angle[1] += m2_nav * self.arm_speed_control
+        angle[1] = np.clip(angle[1], self.min_x_end_effector, self.max_x_end_effector)
 
         # Returns the updated varibals so it can be stored
         return angle
@@ -280,11 +261,8 @@ class TeleopNode:
 
     # Returns true once when button is held down or pressed once
     def evaluate_button(self, button):
-        if self.joy_data.buttons[self.button_mapping[button]] == 1 and self.previous_button_pressed[self.button_mapping[button]] != 1:
-            return True
-        else:
-            return False
-        
+        return self.joy_data.buttons[self.button_mapping[button]] == 1 and self.previous_button_pressed[self.button_mapping[button]] != 1
+
 
     # Loop that keeps the ros node running
     def run(self):
@@ -332,12 +310,12 @@ class TeleopNode:
                 if self.evaluate_button(self.increase_arm_speed):
                     self.arm_speed_control += 0.1
                     self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed, self.arm_max_speed)
-                    rospy.loginfo(self.arm_speed_control)
+                    rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
                 if self.evaluate_button(self.decrease_arm_speed):
                     self.arm_speed_control -= 0.1
                     self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed, self.arm_max_speed)
-                    rospy.loginfo(self.arm_speed_control)
+                    rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
                 # Activates the emergency stop 
                 if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1 and not self.L3_R3_button_prev_state:
@@ -378,7 +356,7 @@ class TeleopNode:
 
                     array2 = Int32MultiArray()
                     array2.data = self.end_effector2_angles
-                    self.end_effector_pub1.publish(array2)
+                    self.end_effector_pub2.publish(array2)
                     
                     if self.arm_initiated == 1 or self.arm_initiated == 3:
                         joint_state = JointState()
@@ -394,9 +372,21 @@ class TeleopNode:
                         joint_state.effort = [0]
                         self.arm_posit_pub2.publish(joint_state)
 
-                    # Create a Twist message and publish it with controls from the joysticks
-                    self.driving_speed()
-                    self.driving()
+                    # Controlls the wheels
+                    if self.evaluate_button(self.increase_drive_speed):
+                        self.speed_controll += 0.1
+                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed, self.drive_max_speed)
+                        rospy.loginfo("Wheel speed: %s", self.speed_controll)
+                
+                    if self.evaluate_button(self.decrease_drive_speed):
+                        self.speed_controll -= 0.1
+                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed, self.drive_max_speed)
+                        rospy.loginfo("Wheel speed: %s", self.speed_controll)
+                    
+                    twist = Twist()
+                    twist.linear.x = self.joy_data.axes[self.axes_mapping[self.drive_forward]] * self.speed_controll
+                    twist.angular.z = self.joy_data.axes[self.axes_mapping[self.drive_turning]] * self.speed_controll 
+                    self.cmd_vel_pub.publish(twist)
 
                 self.previous_button_pressed = self.joy_data.buttons
             self.rate.sleep()
