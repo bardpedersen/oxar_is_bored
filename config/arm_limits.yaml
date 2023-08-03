@@ -25,3 +25,13 @@ end_position_y: 200
 end_position_z: 500
 
 arm_movement: [[0, 200, 300],[0, 200, 400],[0, 200, 500],[0, 200, 200],[100, 200, 400]]
+
+sinus_x_start_end: [-150, 250]
+sinus_speed_x: 1
+sinus_y: 200
+
+cosinus_x_start_end: [-21, 279]
+cosinus_speed_x: 1
+cosinus_z_start_end: [99, 399]
+cosinus_speed_z: 2
+cosinus_y: 200

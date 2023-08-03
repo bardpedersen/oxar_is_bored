@@ -121,6 +121,16 @@ class TeleopNode:
         # List of positions to move
         self.arm_movement = rospy.get_param('arm_movement')
 
+        self.sinus_x_start_end = rospy.get_param('sinus_x_start_end')
+        self.sinus_speed_x = rospy.get_param('sinus_speed_x')
+        self.sinus_y = rospy.get_param('sinus_y')
+
+        self.cosinus_x_start_end = rospy.get_param('cosinus_x_start_end')
+        self.cosinus_z_start_end = rospy.get_param('cosinus_z_start_end')
+        self.cosinus_speed_x = rospy.get_param('cosinus_speed_x')
+        self.cosinus_speed_z = rospy.get_param('cosinus_speed_z')
+        self.cosinus_y = rospy.get_param('cosinus_y')
+
 
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
@@ -297,46 +307,48 @@ class TeleopNode:
         rospy.loginfo('Done moving')
 
     def move_arm_sinusodial(self, pos):
-        if self.sinus_forward:
-            self.sinus_x_number += 1
-        if not self.sinus_forward:
-            self.sinus_x_number -= 1
 
-        if self.sinus_x_number > 250:
+        if self.sinus_forward:
+            self.sinus_x_number += self.sinus_speed_x
+        if not self.sinus_forward:
+            self.sinus_x_number -= self.sinus_speed_x
+
+        if self.sinus_x_number > self.sinus_x_start_end[1]:
             self.sinus_forward = False
 
-        if self.sinus_x_number < -150:
+        if self.sinus_x_number < self.sinus_x_start_end[0]:
             self.sinus_forward = True
 
         pos[0] = self.sinus_x_number
-        pos[1] = 200 
+        pos[1] = self.sinus_y 
         return pos
     
     def move_arm_cosinusodial(self, pos):
+
         if self.cosinus_forward:
-            self.cosinus_x_number += 1
+            self.cosinus_x_number += self.cosinus_speed_x
         if not self.cosinus_forward:
-            self.cosinus_x_number -= 1
+            self.cosinus_x_number -= self.cosinus_speed_x
 
         if self.cosinus_upward:
-            self.cosinus_z_number -= 1
+            self.cosinus_z_number -= self.cosinus_speed_z
         if not self.cosinus_upward:
-            self.cosinus_z_number += 1
+            self.cosinus_z_number += self.cosinus_speed_z
 
-        if self.cosinus_x_number > 279:
+        if self.cosinus_x_number > self.cosinus_x_start_end[1]:
             self.cosinus_forward = False
 
-        if self.cosinus_x_number < -21:
+        if self.cosinus_x_number < self.cosinus_x_start_end[0]:
             self.cosinus_forward = True
         
-        if self.cosinus_z_number > 399:
+        if self.cosinus_z_number > self.cosinus_z_start_end[1]:
             self.cosinus_upward = True
 
-        if self.cosinus_z_number < 99:
+        if self.cosinus_z_number < self.cosinus_z_start_end[0]:
             self.cosinus_upward = False
 
         pos[0] = self.cosinus_x_number
-        pos[1] = 300 
+        pos[1] = self.cosinus_y 
         pos[2] = self.cosinus_z_number
         return pos
 
@@ -453,7 +465,8 @@ class TeleopNode:
                         rospy.logwarn("Unknown status value: {}".format(self.away_statement))
 
                 if self.evaluate_button(self.end_button):
-                    if self.away_statement==1:
+                    rospy.loginfo("check")
+                    if self.away_statement==1 and not self.active_sinusodal and not self.active_cosinusodal:
                         if self.arm1_initiated and self.arm2_initiated:
                             rospy.loginfo("Calibrate one arm at a time")
                         elif self.arm1_initiated:
@@ -463,7 +476,7 @@ class TeleopNode:
                             self.arm2_calib.publish(True)
                             rospy.loginfo('Arm 2 calibrating')
 
-                    elif self.away_statement==2:
+                    elif self.away_statement==2 and not self.active_sinusodal and not self.active_cosinusodal:
                         if self.arm1_initiated and self.arm2_initiated:
                             rospy.loginfo("Put one arm away at a time")
                         elif self.arm1_initiated:
@@ -473,12 +486,12 @@ class TeleopNode:
                             self.arm_away_position2.publish(True)
                             rospy.loginfo('Arm 2 away position')
 
-                    elif self.away_statement==3: 
+                    elif self.away_statement==3 and not self.active_sinusodal and not self.active_cosinusodal:
                         if self.arm1_initiated and self.arm2_initiated:
                             rospy.loginfo('Arm 1 and 2 prevmove')
                             self.move_arm(left=2)                           
                         elif self.arm1_initiated:
-                            rospy.loginfo('Arm 1 prevmove')
+                            rospy.loginfo('Arm 1 prevmove')                         
                             self.move_arm()
                         elif self.arm2_initiated:
                             rospy.loginfo('Arm 2 prevmove')
@@ -531,16 +544,16 @@ class TeleopNode:
                     if self.endeffector2_initiated:
                         self.end_effector2_angles = self.end_effector(self.end_effector2_angles, self.mirror, left=True)
 
-                    if self.arm1_initiated and self.active_sinusodal:
+                    if self.arm1_initiated and self.active_sinusodal and not self.active_cosinusodal:
                         self.armposition_1 = self.move_arm_sinusodial(self.armposition_1)
                     
-                    if self.arm2_initiated and self.active_sinusodal:
+                    if self.arm2_initiated and self.active_sinusodal and not self.active_cosinusodal:
                         self.armposition_2 = self.move_arm_sinusodial(self.armposition_2)
 
-                    if self.arm1_initiated and self.active_cosinusodal:
+                    if self.arm1_initiated and self.active_cosinusodal and not self.active_sinusodal:
                         self.armposition_1 = self.move_arm_cosinusodial(self.armposition_1)
                     
-                    if self.arm2_initiated and self.active_cosinusodal:
+                    if self.arm2_initiated and self.active_cosinusodal and not self.active_sinusodal:
                         self.armposition_2 = self.move_arm_cosinusodial(self.armposition_2)
 
                     # Publish only position when controller is used
