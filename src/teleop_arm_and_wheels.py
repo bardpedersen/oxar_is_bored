@@ -31,7 +31,6 @@ class TeleopNode:
 
         # Variables for speed control for the arms
         self.arm_speed_control = 2
-        self.speed_controll = 0.5
 
          # Set the ros rate to be the same as the arms
         self.rate = rospy.Rate(40)
@@ -109,6 +108,8 @@ class TeleopNode:
         self.home_position_x = rospy.get_param('home_position_x')
         self.home_position_y = rospy.get_param('home_position_y')
         self.home_position_z = rospy.get_param('home_position_z')
+
+        self.speed_controll = rospy.get_param('/linear_velocity', 0.4)
 
 
     # Makes position follow the real values when controller is not in use
@@ -376,17 +377,20 @@ class TeleopNode:
                     if self.evaluate_button(self.increase_drive_speed):
                         self.speed_controll += 0.1
                         self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed, self.drive_max_speed)
+                        rospy.set_param('/linear_velocity', float(self.speed_controll))      
                         rospy.loginfo("Wheel speed: %s", self.speed_controll)
                 
                     if self.evaluate_button(self.decrease_drive_speed):
                         self.speed_controll -= 0.1
                         self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed, self.drive_max_speed)
+                        rospy.set_param('/linear_velocity', float(self.speed_controll))
                         rospy.loginfo("Wheel speed: %s", self.speed_controll)
-                    
-                    twist = Twist()
-                    twist.linear.x = self.joy_data.axes[self.axes_mapping[self.drive_forward]] * self.speed_controll
-                    twist.angular.z = self.joy_data.axes[self.axes_mapping[self.drive_turning]] * self.speed_controll 
-                    self.cmd_vel_pub.publish(twist)
+
+                    if self.joy_data.axes[self.axes_mapping[self.drive_forward]]!=0 or self.joy_data.axes[self.axes_mapping[self.drive_turning]]!=0:
+                        twist = Twist()
+                        twist.linear.x = self.joy_data.axes[self.axes_mapping[self.drive_forward]] * self.speed_controll
+                        twist.angular.z = self.joy_data.axes[self.axes_mapping[self.drive_turning]] * self.speed_controll 
+                        self.cmd_vel_pub.publish(twist)
 
                 self.previous_button_pressed = self.joy_data.buttons
             self.rate.sleep()

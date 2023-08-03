@@ -2,7 +2,14 @@
 
 #/home/noronn/Desktop/.arm2_launch.sh
 
-sleep 50
+check_network() {
+  ping -c 1 192.168.0.1 > /dev/null 2>&1
+}
+
+while ! check_network; do
+  sleep 5
+done
+
 
 # Function to run ROS launch file in a new xterm terminal
 function run_ros_launch_in_xterm() {
