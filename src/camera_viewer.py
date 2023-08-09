@@ -3,9 +3,11 @@
 import rospy
 import cv2
 from sensor_msgs.msg import Image
-from sensor_msgs.msg import Joy
 from cv_bridge import CvBridge
+# from sensor_msgs.msg import Joy
 
+
+# This node subscribes to multiple camera topics and displays the images in a single window
 class CameraDisplayNode:
     def __init__(self):
         self.images = []
@@ -15,16 +17,17 @@ class CameraDisplayNode:
         self.window_name = "Camera Display"
         self.im_tile_resize = None
 
-    def joy_callback(self, joy_msg):
-        # Check if the dpad left and right is pressed
-        if joy_msg.axes[6] == -1:
-            # Increment the camera index
-            self.index = (self.index + 1) % len(self.valid_images)
-        elif joy_msg.axes[6] == 1:
-            # Decrement the camera index
-            self.index = (self.index - 1) % len(self.valid_images)
+    # Not needed
+    # def joy_callback(self, joy_msg):
+    #    # Check if the dpad left and right is pressed
+    #    if joy_msg.axes[6] == -1:
+    #        # Increment the camera index
+    #        self.index = (self.index + 1) % len(self.valid_images)
+    #    elif joy_msg.axes[6] == 1:
+    #        # Decrement the camera index
+    #        self.index = (self.index - 1) % len(self.valid_images)
         
-        # Switch between cameras with mouse
+    # Switch between cameras with mouse or touch screen
     def mouse_callback(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
             num_cameras = len(self.valid_images)
@@ -56,10 +59,10 @@ class CameraDisplayNode:
             if len(self.valid_images) == 1:
                 self.im_tile_resize = self.valid_images[0]
             else:
-                self.im_tile_resize = self.concat_tile_resize([[self.valid_images[self.index]], self.valid_images])
+                self.im_tile_resize = self.concat_tile_resize([[self.valid_images[self.index]],
+                                                               self.valid_images])
 
-            # Add camera number text to each image
-            
+            # Add camera number text to each image 
             num_cameras = len(self.valid_images)
             image_width = int(self.im_tile_resize.shape[1] / num_cameras)
             image_height = int(self.im_tile_resize.shape[0] - image_width*0.75)
@@ -67,36 +70,43 @@ class CameraDisplayNode:
                 x = i * image_width + 5
                 y = image_height + 25
                 text = "Camera {}".format(i + 1)
-                cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2/num_cameras, (0, 0, 0), int(2/num_cameras))
+                cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_COMPLEX,
+                            2/num_cameras, (0, 0, 0), int(2/num_cameras))
 
                 if i == self.index:
-                    x = 25 # Need to define better
-                    y = 75 # Need to define better
-                    cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1)
+                    x = 25  # Need to define better
+                    y = 75  # Need to define better
+                    cv2.putText(self.im_tile_resize, text, (x, y), cv2.FONT_HERSHEY_COMPLEX,
+                                2, (255, 255, 255), 1)
             
             # Show the combined image in full screen
             cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
             cv2.setWindowProperty(self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
             cv2.imshow(self.window_name, self.im_tile_resize)
-            cv2.setMouseCallback(self.window_name, self.mouse_callback) # To switch between cameras with mouse
-
+            cv2.setMouseCallback(self.window_name, self.mouse_callback)
+            # To switch between cameras with mouse
 
     # Create the image by merging the height and width
     def concat_tile_resize(self, im_list_2d, interpolation=cv2.INTER_CUBIC):
-        im_list_v = [self.hconcat_resize_min(im_list_h, interpolation=cv2.INTER_CUBIC) for im_list_h in im_list_2d]
-        return self.vconcat_resize_min(im_list_v, interpolation=cv2.INTER_CUBIC)
+        im_list_v = [self.hconcat_resize_min(im_list_h, interpolation=interpolation)
+                     for im_list_h in im_list_2d]
+        return self.vconcat_resize_min(im_list_v, interpolation=interpolation)
 
     # Resize all images to the same width and concatenate them vertically
+    # noinspection PyMethodMayBeStatic
     def vconcat_resize_min(self, im_list, interpolation=cv2.INTER_CUBIC):
         w_min = min(im.shape[1] for im in im_list)
-        im_list_resize = [cv2.resize(im, (w_min, int(im.shape[0] * w_min / im.shape[1])), interpolation=interpolation)
+        im_list_resize = [cv2.resize(im, (w_min, int(im.shape[0] * w_min / im.shape[1])),
+                                     interpolation=interpolation)
                           for im in im_list]
         return cv2.vconcat(im_list_resize)
 
     # Resize the images to the same height and concatenate them horizontally
+    # noinspection PyMethodMayBeStatic
     def hconcat_resize_min(self, im_list, interpolation=cv2.INTER_CUBIC):
         h_min = min(im.shape[0] for im in im_list)
-        im_list_resize = [cv2.resize(im, (int(im.shape[1] * h_min / im.shape[0]), h_min), interpolation=interpolation)
+        im_list_resize = [cv2.resize(im, (int(im.shape[1] * h_min / im.shape[0]), h_min),
+                                     interpolation=interpolation)
                           for im in im_list]
         return cv2.hconcat(im_list_resize)
 
@@ -106,12 +116,13 @@ class CameraDisplayNode:
         # Wait for the parameter to be set
         while not rospy.has_param("camera_topics"):
             rospy.sleep(1)
-            #rospy.loginfo("Waiting for parameters")
+            # rospy.loginfo("Waiting for parameters")
 
         camera_topics = rospy.get_param("camera_topics")
 
         # Create a controller subscriber
-        rospy.Subscriber("/joy", Joy, self.joy_callback)
+        # Not needed
+        # rospy.Subscriber("/joy", Joy, self.joy_callback)
 
         # Create camera subscribers and image buffers
         for i, topic in enumerate(camera_topics):
@@ -122,9 +133,10 @@ class CameraDisplayNode:
         rospy.loginfo("Camera viewer node has been started")
         rospy.loginfo("Camera topics: %s", camera_topics)
 
+        # Use keyboard to switch cameras and quit image display
         while not rospy.is_shutdown():
             key = cv2.waitKey(1) & 0xFF
-            if key >= ord('0') and key < ord(str(len(camera_topics))):
+            if ord('0') <= key < ord(str(len(camera_topics))):
                 self.index = key - ord('0')
             elif key == ord('q'):
                 break
@@ -133,6 +145,7 @@ class CameraDisplayNode:
             rate.sleep()
 
         cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     rospy.init_node("camera_viewer_node")

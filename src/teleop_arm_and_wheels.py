@@ -10,16 +10,18 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray, Float32MultiArray
 from geometry_msgs.msg import PoseArray
 
+
 class TeleopNode:
     def __init__(self):
-        
+        # Load parameters
         self.load_params()
         
+        # Variables for storing states
         self.T_buttons_initiated_ = False
-        self.arm_initiated = 0  #0 is none, 1 is arm1, 2 is arm2 and 3 is both arms
-        self.endeffector_initiated = 0  #0 is none, 1 is endeffector1, 2 is endeffector2 and 3 is both endeffectors
+        self.arm_initiated = 0  # 0 is none, 1 is arm1, 2 is arm2 and 3 is both arms
+        self.endeffector_initiated = 0  # 0-3, same as the arms
         self.L3_R3_button_prev_state = False
-        self.safety_stop_= False
+        self.safety_stop_ = False
         self.previous_button_pressed = [0] * len(self.button_mapping)
 
         # Variables for storing arm positions
@@ -28,44 +30,45 @@ class TeleopNode:
         self.end_effector1_angles = np.array([90, 90])
         self.end_effector2_angles = np.array([90, 90])
 
-
         # Variables for speed control for the arms
         self.arm_speed_control = 2
 
-         # Set the ros rate to be the same as the arms
+        # Set the ros rate to be the same as the arms
         self.rate = rospy.Rate(40)
         self.joy_data = None
 
-        # Create a publisher for the cmd_vel topic
+        # Initialize ROS publishers
         self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
         self.arm_posit_pub1 = rospy.Publisher('arm1position', JointState, queue_size=10)
         self.arm_posit_pub2 = rospy.Publisher('arm2position', JointState, queue_size=10)
         self.end_effector_pub1 = rospy.Publisher('endeffector1', Int32MultiArray, queue_size=10)
         self.end_effector_pub2 = rospy.Publisher('endeffector2', Int32MultiArray, queue_size=10)
 
+        # Initialize ROS services
         self.safety_stop_service1 = rospy.ServiceProxy('safety_stop_arm1', SetBool)
         self.safety_stop_service2 = rospy.ServiceProxy('safety_stop_arm2', SetBool)
         self.safety_stop_service_wheel = rospy.ServiceProxy('safety_stop', SetBool)
         self.home_steering_service = rospy.ServiceProxy('home_steering', Trigger)
 
+        # Initialize ROS subscribers
         rospy.Subscriber('arm1_cur_pos', PoseArray, self.arm_pos1_callback)
         rospy.Subscriber('arm2_cur_pos', PoseArray, self.arm_pos2_callback)
         rospy.Subscriber('arm1_angle', Float32MultiArray, self.arm_endef_angle1)
         rospy.Subscriber('arm2_angle', Float32MultiArray, self.arm_endef_angle2)
         rospy.Subscriber('joy_arms_wheels', Joy, self.joy_callback)
 
+        # Initialize the ROS node
         rospy.loginfo('Teleop_node started')
         rospy.loginfo('Press X to enable the arms')
         rospy.loginfo('Press Y to enable the end effectors')
         rospy.loginfo('Press L3 and R3 to enable safety stop')
-
 
     def load_params(self):
         # Get the button and axes mapping from the parameter server
         self.button_mapping = rospy.get_param('button_map')
         self.axes_mapping = rospy.get_param('axes_map')
 
-        # Get button action and correspondoing button from paramter server
+        # Get button action and corresponding button from parameter server
         self.activate_arm_button = rospy.get_param('activate_arm_button')
         self.activate_endef_button = rospy.get_param('activate_endef_button')
 
@@ -109,12 +112,12 @@ class TeleopNode:
         self.home_position_y = rospy.get_param('home_position_y')
         self.home_position_z = rospy.get_param('home_position_z')
 
+        # Variable for speed control for the wheels
         self.speed_controll = rospy.get_param('/linear_velocity', 0.4)
-
 
     # Makes position follow the real values when controller is not in use
     def arm_pos1_callback(self, data):
-        if self.arm_initiated == 0 or self.arm_initiated == 2  or self.safety_stop_:
+        if self.arm_initiated == 0 or self.arm_initiated == 2 or self.safety_stop_:
             pose = data.poses[0].position
             self.armposition_1 = np.array([pose.x, pose.y, pose.z])
 
@@ -126,13 +129,14 @@ class TeleopNode:
     def arm_endef_angle1(self, data):
         if self.endeffector_initiated == 0 or self.endeffector_initiated == 2:
             angles = np.degrees(data.data)
-            self.end_effector1_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector, self.max_x_end_effector)
+            self.end_effector1_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
+                                                         self.max_x_end_effector)
 
     def arm_endef_angle2(self, data):
         if self.endeffector_initiated == 0 or self.endeffector_initiated == 1:
             angles = np.degrees(data.data)
-            self.end_effector2_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector, self.max_x_end_effector)
-
+            self.end_effector2_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
+                                                         self.max_x_end_effector)
 
     # Calls safety stop service to stop arms
     def safety_stop(self):
@@ -168,7 +172,6 @@ class TeleopNode:
         except rospy.ServiceException as e:
             rospy.logerr('Service call failed: ' + str(e))
 
-
     def home_steering(self):
         # home_steering for wheels
         trigger_req = TriggerRequest()
@@ -181,12 +184,11 @@ class TeleopNode:
         except rospy.ServiceException as e:
             rospy.logerr('Service call failed: ' + str(e))
 
-
     # Function for controlling the arms
     def controll_arm(self, pos, left=False): 
-        #pos[0] # x
-        #pos[1] # y
-        #pos[2] # z
+        # pos[0] # x
+        # pos[1] # y
+        # pos[2] # z
 
         # Reset the arm to home position
         if self.evaluate_button(self.home_button):
@@ -196,13 +198,12 @@ class TeleopNode:
             rospy.loginfo('Arm reset')
             return pos
         
-        # Controlls for right arm
-                # Controlls for right arm
+        # Controls for right arm
         if not left:
             x_nav = self.joy_data.axes[self.axes_mapping[self.arm_x]]
             y_nav = self.joy_data.axes[self.axes_mapping[self.arm_y]]
 
-        # Controlls for left arm
+        # Controls for left arm
         if left:
             x_nav = -self.joy_data.axes[self.axes_mapping[self.arm_x]]
             y_nav = -self.joy_data.axes[self.axes_mapping[self.arm_y]]
@@ -216,14 +217,15 @@ class TeleopNode:
 
         # Check if the LT, RT buttons are initiated
         if self.T_buttons_initiated_:
-            # Uses the LT and RT buttons to control the z-axis linearly, more pressed bigger increment
-            pos[2] += (1 - self.joy_data.axes[self.axes_mapping[self.arm_up]]) / 2 * self.arm_speed_control
-            pos[2] -= (1 - self.joy_data.axes[self.axes_mapping[self.arm_down]]) / 2 * self.arm_speed_control
+            # Uses the LT and RT buttons to control the z-axis linearly
+            pos[2] += (1 - self.joy_data.axes[self.axes_mapping[self.arm_up]]
+                       ) / 2 * self.arm_speed_control
+            pos[2] -= (1 - self.joy_data.axes[self.axes_mapping[self.arm_down]]
+                       ) / 2 * self.arm_speed_control
             pos[2] = np.clip(pos[2], self.min_z_arm, self.max_z_arm)
 
-        # Returns the updated varibals so it can be stored
+        # Returns the updated variables so it can be stored
         return pos
-
 
     # Function for controlling the end effector
     def end_effector(self, angle, left=False):
@@ -234,12 +236,12 @@ class TeleopNode:
             rospy.loginfo('End effector reset')
             return angle
         
-        # Controlls for right end effector
+        # Controls for right end effector
         if not left:
             m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
             m2_nav = self.joy_data.axes[self.axes_mapping[self.endef_side]]
 
-        # Controlls for left end effector
+        # Controls for left end effector
         if left:
             m1_nav = self.joy_data.axes[self.axes_mapping[self.endef_up]]
             m2_nav = -self.joy_data.axes[self.axes_mapping[self.endef_side]]
@@ -251,28 +253,28 @@ class TeleopNode:
         angle[1] += m2_nav * self.arm_speed_control
         angle[1] = np.clip(angle[1], self.min_x_end_effector, self.max_x_end_effector)
 
-        # Returns the updated varibals so it can be stored
+        # Returns the updated variables so it can be stored
         return angle
-
 
     # Callback function for the "joy" topic
     def joy_callback(self, data):
         self.joy_data = data
 
-
     # Returns true once when button is held down or pressed once
     def evaluate_button(self, button):
-        return self.joy_data.buttons[self.button_mapping[button]] == 1 and self.previous_button_pressed[self.button_mapping[button]] != 1
-
+        return self.joy_data.buttons[self.button_mapping[button]] == 1 and \
+            self.previous_button_pressed[self.button_mapping[button]] != 1
 
     # Loop that keeps the ros node running
     def run(self):
         while not rospy.is_shutdown():
-            # Checks if the joy_data has been recived
+            # Checks if the joy_data has been received
             if self.joy_data is not None:
-                # Bypass that RT and LT starts with 0 as default value and default value changes to 1 when pressed.
+                # Bypass that RT and LT starts with 0 as default value and default
+                # value changes to 1 when pressed.
                 # Check if the RT and LT buttons have been pressed, first then are they in use
-                if not self.T_buttons_initiated_ and self.joy_data.axes[2] == 1 and self.joy_data.axes[5] == 1:
+                if not self.T_buttons_initiated_ and self.joy_data.axes[2] == 1 and \
+                        self.joy_data.axes[5] == 1:
                     self.T_buttons_initiated_ = True
                     rospy.loginfo("LT and RT are ready to be used")
 
@@ -280,8 +282,8 @@ class TeleopNode:
                 if self.evaluate_button(self.home_steering_button):
                     self.home_steering()
 
-                    # Changes only when x button is pressed, not hold down
-                    # Switches between left and right arm
+                # Changes only when x button is pressed, not hold down
+                # Switches between left and right arm
                 if self.evaluate_button(self.activate_arm_button):
                     self.arm_initiated = (self.arm_initiated + 1) % 4
 
@@ -310,16 +312,20 @@ class TeleopNode:
                 # Adjust the speed of the arms
                 if self.evaluate_button(self.increase_arm_speed):
                     self.arm_speed_control += 0.1
-                    self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed, self.arm_max_speed)
+                    self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed,
+                                                     self.arm_max_speed)
                     rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
                 if self.evaluate_button(self.decrease_arm_speed):
                     self.arm_speed_control -= 0.1
-                    self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed, self.arm_max_speed)
+                    self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed,
+                                                     self.arm_max_speed)
                     rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
                 # Activates the emergency stop 
-                if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1 and not self.L3_R3_button_prev_state:
+                if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1\
+                        and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]]\
+                        == 1 and not self.L3_R3_button_prev_state:
                     self.safety_stop_ = not self.safety_stop_
                     self.safety_stop()
                     if self.safety_stop_:
@@ -327,21 +333,23 @@ class TeleopNode:
                     else:
                         rospy.loginfo("Safety Disabled")
                         
-                if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1:
+                if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and \
+                        self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1:
                     self.L3_R3_button_prev_state = True
                 else:
                     self.L3_R3_button_prev_state = False
 
-                # Choses witch arm and end effector to controll with joy
+                # Chooses witch arm and end effector to control with joy
                 if not self.safety_stop_:
-                # Can only controll end effector when Y is pressed down
                     if self.endeffector_initiated == 1:
                         self.end_effector1_angles = self.end_effector(self.end_effector1_angles)
                     elif self.endeffector_initiated == 2:
-                        self.end_effector2_angles = self.end_effector(self.end_effector2_angles, left=True)
+                        self.end_effector2_angles = self.end_effector(self.end_effector2_angles,
+                                                                      left=True)
                     elif self.endeffector_initiated == 3:
                         self.end_effector1_angles = self.end_effector(self.end_effector1_angles)
-                        self.end_effector2_angles = self.end_effector(self.end_effector2_angles, left=True)
+                        self.end_effector2_angles = self.end_effector(self.end_effector2_angles,
+                                                                      left=True)
 
                     if self.arm_initiated == 1:
                         self.armposition_1 = self.controll_arm(self.armposition_1)
@@ -373,23 +381,30 @@ class TeleopNode:
                         joint_state.effort = [0]
                         self.arm_posit_pub2.publish(joint_state)
 
-                    # Controlls the wheels
+                    # Controls the wheels
                     if self.evaluate_button(self.increase_drive_speed):
                         self.speed_controll += 0.1
-                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed, self.drive_max_speed)
+                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed,
+                                                      self.drive_max_speed)
                         rospy.set_param('/linear_velocity', float(self.speed_controll))      
                         rospy.loginfo("Wheel speed: %s", self.speed_controll)
                 
                     if self.evaluate_button(self.decrease_drive_speed):
                         self.speed_controll -= 0.1
-                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed, self.drive_max_speed)
+                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed,
+                                                      self.drive_max_speed)
                         rospy.set_param('/linear_velocity', float(self.speed_controll))
                         rospy.loginfo("Wheel speed: %s", self.speed_controll)
 
-                    if self.joy_data.axes[self.axes_mapping[self.drive_forward]]!=0 or self.joy_data.axes[self.axes_mapping[self.drive_turning]]!=0:
+                    if self.joy_data.axes[self.axes_mapping[self.drive_forward]] != 0 or \
+                            self.joy_data.axes[self.axes_mapping[self.drive_turning]] != 0:
                         twist = Twist()
-                        twist.linear.x = self.joy_data.axes[self.axes_mapping[self.drive_forward]] * self.speed_controll
-                        twist.angular.z = self.joy_data.axes[self.axes_mapping[self.drive_turning]] * self.speed_controll 
+                        twist.linear.x = \
+                            self.joy_data.axes[self.axes_mapping[self.drive_forward]] * \
+                            self.speed_controll
+                        twist.angular.z = \
+                            self.joy_data.axes[self.axes_mapping[self.drive_turning]] * \
+                            self.speed_controll
                         self.cmd_vel_pub.publish(twist)
 
                 self.previous_button_pressed = self.joy_data.buttons
