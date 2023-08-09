@@ -1,4 +1,4 @@
-# Summer job 2023 for the Multi-arm Robot System (MARS)
+# Summer job 2023 for the RoboFarmer Robot System (MARS)
 
 Code used for our summer job at [NMBU](https://www.nmbu.no) with the [RoboFarmer](https://prosjektbanken.forskningsradet.no/project/FORISS/336712) project.
 
