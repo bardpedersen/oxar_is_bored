@@ -26,7 +26,6 @@ button_map: {
             }
 
 
-
 # Button actions with corresponding button
 activate_arm_button: button_X
 activate_endef_button: button_Y
@@ -47,7 +46,6 @@ endef_side: axis_Dpad_side
 
 drive_forward: axis_R_up
 drive_turning: axis_R_side
-
 
 home_button: button_B
 home_steering_button: button_A
