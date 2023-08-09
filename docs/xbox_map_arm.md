@@ -1,4 +1,4 @@
-# Xbox Controller Button Mapping
+# Xbox Controller Button Mapping for arms
 
 This README file provides a visual mapping of every button on an Xbox controller and its function.
 
