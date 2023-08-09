@@ -1,4 +1,4 @@
-# Xbox Controller Button Mapping
+# Xbox Controller Button Mapping for arms and wheel
 
 This README file provides a visual mapping of every button on an Xbox controller and its function.
 
@@ -19,16 +19,17 @@ This README file provides a visual mapping of every button on an Xbox controller
 11. **Y Button**: Switches between the end effectors
 12. **B Button**: Moves the arm to home position, moves the end effector to home position when Y is beeing pressed.
 13. **A Button**: Call the homing service that realign the wheels
-14. **X Button**: Switches the arm that is beeing controlled
+14. **X Button**: Switches between the arms
 
 **L3** and **R3** the safety service is called and the robot stops.
 
+## More info
+
 **LT** and **RT** need to be pressed down completly before they are in use.
 
-## Usage
+**L3** is **Left stick** pressed down, and **R3** is **Right stick** pressed down.
 
+## Usage
 You can refer to this button mapping diagram when driving thorvald and controlling the arms with the teleop_arm_and_wheels.py
 
 When endeffectors are not active they will follow the arms so that the camera always follows the y-axis (global frame). The tilt will remain from its last setpoint.
-
-**L3** is **Left stick** pressed down, and **R3** is **Right stick** pressed down.

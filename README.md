@@ -1,12 +1,13 @@
-# Sommerjobb 2023 for the Multi-arm Robot System (MARS)
+# Summer job 2023 for the Multi-arm Robot System (MARS)
 
-Here are the code used for our sommerjobb at NMBU.
+Code used for our summer job at [NMBU](https://www.nmbu.no) with the [RoboFarmer](https://prosjektbanken.forskningsradet.no/project/FORISS/336712) project.
 
-Writen by @Sneglen99 and @bardpedersen.
+Code is writen and maintained by [@Sneglen99](https://github.com/sneglen99) and [@bardpedersen](https://github.com/bardpedersen).
 
-arduino: cointains code used on endeffectors
-config: files containg params for the controller nodes
-docs: cointains all the documentation for the files and how to use them
-launch: files for launching the different nodes
-shell: files for launching files at startup and for shutting down all pc from ssh
-src: source code used for this project
+Structure of the code:
+- arduino: Contains code used on the arduino in the end-effectors.
+- config: Files contain params for the controller nodes.
+- docs: Contains all the documentation for the how to control the robot with a controller.
+- launch: Files for launching the different nodes.
+- shell: Files for launching files at startup and for shutting down all pc from ssh.
+- src: Source code used for this project.
