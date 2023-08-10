@@ -21,5 +21,5 @@ function run_ros_launch_in_xterm() {
 # Run ROS launch files in new gnome terminals
 run_ros_launch_in_xterm "harvester harvester_arm1.launch" 
 run_ros_launch_in_xterm "oxar_is_bored end_effector1.launch"
-run_ros_launch_in_xterm "realsense2_camera rs_camera.launch camera:=cam_2 serial_no:=806312060325 filters:=pointcloud"
-run_ros_launch_in_xterm "realsense2_camera rs_camera.launch camera:=cam_1 serial_no:=825312071978 filters:=pointcloud"
+run_ros_launch_in_xterm "realsense2_camera rs_camera.launch camera:=camera_r2 serial_no:=051422074112 filters:=pointcloud initial_reset:=true depth_fps:=15 color_fps:=15"
+run_ros_launch_in_xterm "realsense2_camera rs_camera.launch camera:=camera_r1 serial_no:=825312071978 filters:=pointcloud initial_reset:=true depth_fps:=15 color_fps:=15"
