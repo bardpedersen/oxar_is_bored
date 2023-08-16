@@ -1,10 +1,7 @@
 <launch>
-  <!-- Robot_description -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/thorvald_arm.urdf'" />
 
-  <!-- Launch RViz -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_visual.rviz" />
- 
+  <!-- Robot_description -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/thorvald_arc.urdf'" />
 
   <!-- Start robot state publisher -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
@@ -12,5 +9,8 @@
   <!-- Start joint state publisher -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
   <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+
+  <!-- Launch RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_visual.rviz" />
 
 </launch>

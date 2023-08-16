@@ -3,19 +3,23 @@
 
   <!-- Import the materials -->
   <xacro:include filename="materials.xacro"/>
+  <xacro:include filename="thorvald_arm.xacro"/>
 
   <!-- Base Link -->
-  <link name="base_link">
-    <!-- Visual representation using STL mesh with white material -->
-    <visual>
-      <geometry>
-        <mesh filename="package://oxar_is_bored/mesh/Arc.stl" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <!-- Use the white_material macro -->
-      <xacro:white_material/>
-    </visual>
-  </link>
+  <link name="base_link"/>
 
-  <!-- ... Rest of the URDF ... -->
+  <!-- Arc -->
+  <xacro:stl name="arc_link" filename="Arc.stl"/>
+  <joint name="arc_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="arc_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Arm1 -->
+  <xacro:thorvald_arm name="armL" parent="arc_link" xyz="0.55 -0.55 0.2" rpy="0 0 0"/>
+
+  <!-- Arm2 -->
+  <xacro:thorvald_arm name="armR" parent="arc_link" xyz="0.55 0.55 0.2" rpy="0 0 3.14"/>
 
 </robot>

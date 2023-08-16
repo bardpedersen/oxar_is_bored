@@ -62,12 +62,65 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        arm1_link:
+        arc_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        arm2_link:
+        armL_arm1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armL_arm2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armL_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        armL_base_offset_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armL_end1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armL_end2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armR_arm1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armR_arm2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armR_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        armR_base_offset_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armR_end1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        armR_end2_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -76,11 +129,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        base_offset_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -115,7 +163,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.6869199872016907
+      Distance: 0.8446756601333618
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -123,17 +171,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.019903099164366722
-        Y: 0.2739984095096588
-        Z: 0.10004577785730362
+        X: -0.1795322746038437
+        Y: 0.021110262721776962
+        Z: 0.7472257614135742
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4803980886936188
+      Pitch: 0.5703980326652527
       Target Frame: <Fixed Frame>
-      Yaw: 2.370396614074707
+      Yaw: 2.8154032230377197
     Saved: ~
 Window Geometry:
   Displays:
