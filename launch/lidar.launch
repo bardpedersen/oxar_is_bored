@@ -1,0 +1,11 @@
+<launch>
+
+  <include file="$(find ouster-ros)/launch/driver.launch">
+    <arg name="sensor_hostname" value="192.168.0.187" />
+    <arg name="viz" value="false" />
+  </include>
+
+</launch>
+
+<!--Need to be launched from a computer with ros noetic or melodic-->
+<!--Lidar ip can be found with ```sudo nmap -sn ip/24``` (replace ip with ip to router) or ```sudo arp-scan --localnet```-->
