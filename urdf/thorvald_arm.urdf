@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="thorvald_arm">
+
+    <!-- Import the materials -->
+    <xacro:include filename="macros.xacro"/>
+
+    <!-- Base Link -->
+    <link name="base_link"/>
+
+    <!-- Joint 1 -->
+    <xacro:stl name="arm1_link" filename="Arm_joint_1.stl"/>
+    <joint name="joint_1" type="revolute">
+        <parent link="base_link"/>
+        <child link="arm1_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="10.0" velocity="1.0" lower="-1.57" upper="1.57"/>
+    </joint>
+
+    <!-- Joint 2 -->
+    <xacro:stl name="arm2_link" filename="Arm_joint_2.stl"/>
+    <joint name="joint_2" type="revolute">
+        <parent link="arm1_link"/>
+        <child link="arm2_link"/>
+        <origin xyz="0 0.2 0" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="100.0" velocity="1.0" lower="-2.5" upper="2.5"/>
+    </joint>
+
+    <!-- Joint 3 -->
+    <xacro:stl name="base_offset_link" filename="End effector.stl"/>
+    <joint name="joint_3" type="revolute">
+        <parent link="arm2_link"/>
+        <child link="base_offset_link"/>
+        <origin xyz="0 0.16 0.025" rpy="1.57 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="100.0" velocity="1.0" lower="0" upper="0"/>
+    </joint>
+    
+    <!-- Joint 4 -->
+    <xacro:stl name="end1_link" filename="End_joint_1.stl"/>
+    <joint name="joint_4" type="revolute">
+        <parent link="base_offset_link"/>
+        <child link="end1_link"/>
+        <origin xyz="0 0.223 -0.02" rpy="0 1.57 0"/>
+        <axis xyz="0 1 0"/>
+        <limit effort="100.0" velocity="1.0" lower="-1.57" upper="1.57"/>
+    </joint>
+
+    <!-- Joint 5 -->
+    <xacro:stl name="end2_link" filename="End_joint_2.stl"/>
+    <joint name="joint_5" type="revolute">
+        <parent link="end1_link"/>
+        <child link="end2_link"/>
+        <origin xyz="0.05 -0.015 0.018" rpy="1.57 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit effort="100.0" velocity="1.0" lower="-1.57" upper="1.57"/>
+    </joint>
+
+</robot>
