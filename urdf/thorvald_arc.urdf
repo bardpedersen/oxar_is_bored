@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="thorvald_arm">
+
+  <!-- Import the materials -->
+  <xacro:include filename="materials.xacro"/>
+
+  <!-- Base Link -->
+  <link name="base_link">
+    <!-- Visual representation using STL mesh with white material -->
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/mesh/Arc.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <!-- Use the white_material macro -->
+      <xacro:white_material/>
+    </visual>
+  </link>
+
+  <!-- ... Rest of the URDF ... -->
+
+</robot>

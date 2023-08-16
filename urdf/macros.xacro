@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="macros">
+
+    <!-- Import the materials -->
+    <xacro:include filename="materials.xacro"/>
+
+    <!-- Import stl file as link-->
+    <xacro:macro name="stl" params="name filename">
+        <link name="${name}">
+            <visual>
+                <geometry>
+                    <mesh filename="package://oxar_is_bored/mesh/${filename}" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <xacro:white_material/>
+            </visual>
+        </link>
+    </xacro:macro>
+
+</robot>
