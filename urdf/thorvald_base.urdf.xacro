@@ -1,0 +1,1196 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot name="thorvald_panda" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Define properties -->
+  <xacro:property name="width" value="1.34" />
+
+  <!-- Create base link -->
+  <link name="base_link"/>
+
+  <!-- MATERIAL DEFINITIONS -->
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="red">
+    <color rgba="1 0 0 1"/>
+  </material>
+  <material name="green">
+    <color rgba="0 1 0 1"/>
+  </material>
+  <material name="alu">
+    <color rgba="0.75 0.75 0.75 1"/>
+  </material>
+  <material name="blue">
+    <color rgba="0.0 0.0 0.8 1.0"/>
+  </material>
+
+
+  <!-- CREATE ROBOT -->
+  <link name="top0">
+    <inertial>
+      <mass value="10.21"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.187252250833" ixy="0.0" ixz="0.0" iyy="0.209836770833" iyz="0.0" izz="0.119499541667"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="base_linktop0" type="fixed">
+    <parent link="base_link"/>
+    <child link="top0"/>
+    <origin rpy="0 0 3.14159265359" xyz="-0.67792 ${-width/2} 0.65"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="leg0">
+    <inertial>
+      <mass value="15.64"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.035581" ixy="0.0" ixz="0.0" iyy="0.035581" iyz="0.0" izz="0.012512"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 3.14159265359" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+        <!--mesh filename="package://thorvald_base/meshes/top_chassis.dae"/-->
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 3.14159265359" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="steering0" type="continuous">
+    <parent link="base_link"/>
+    <child link="leg0"/>
+    <origin rpy="0 0 0" xyz="-0.67792 ${-width/2} 0.2"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="10000"/>
+  </joint>
+  <transmission name="steering0_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="steering0">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="steering0_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  
+  <link name="wheel0_link">
+    <inertial>
+      <mass value="6.0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0728" ixy="0.0" ixz="0.0" iyy="0.0728" iyz="0.0" izz="0.12"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wheel0_link">
+    <material>Gazebo/Black</material>
+    <mu1 value="2"/>
+    <mu2 value="2"/>
+  </gazebo>
+  <joint name="wheel0" type="continuous">
+    <parent link="leg0"/>
+    <child link="wheel0_link"/>
+    <origin rpy="-1.57079632679 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="1000"/>
+  </joint>
+  <transmission name="wheel0_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel0">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wheel0_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <link name="top1">
+    <inertial>
+      <mass value="10.21"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.187252250833" ixy="0.0" ixz="0.0" iyy="0.209836770833" iyz="0.0" izz="0.119499541667"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-MIRROR-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-MIRROR-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="base_linktop1" type="fixed">
+    <parent link="base_link"/>
+    <child link="top1"/>
+    <origin rpy="0 0 0" xyz="0.67792 ${-width/2} 0.65"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="leg1">
+    <inertial>
+      <mass value="15.64"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.035581" ixy="0.0" ixz="0.0" iyy="0.035581" iyz="0.0" izz="0.012512"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-MIRROR-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+        <!--mesh filename="package://thorvald_base/meshes/top_chassis.dae"/-->
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-MIRROR-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="steering1" type="continuous">
+    <parent link="base_link"/>
+    <child link="leg1"/>
+    <origin rpy="0 0 0" xyz="0.67792 ${-width/2} 0.2"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="10000"/>
+  </joint>
+  <transmission name="steering1_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="steering1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="steering1_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
+  <link name="wheel1_link">
+    <inertial>
+      <mass value="6.0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0728" ixy="0.0" ixz="0.0" iyy="0.0728" iyz="0.0" izz="0.12"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wheel1_link">
+    <material>Gazebo/Black</material>
+    <mu1 value="2"/>
+    <mu2 value="2"/>
+  </gazebo>
+  <joint name="wheel1" type="continuous">
+    <parent link="leg1"/>
+    <child link="wheel1_link"/>
+    <origin rpy="-1.57079632679 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="1000"/>
+  </joint>
+  <transmission name="wheel1_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wheel1_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+   
+  <link name="top2">
+    <inertial>
+      <mass value="10.21"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.187252250833" ixy="0.0" ixz="0.0" iyy="0.209836770833" iyz="0.0" izz="0.119499541667"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="base_linktop2" type="fixed">
+    <parent link="base_link"/>
+    <child link="top2"/>
+    <origin rpy="0 0 0" xyz="0.67792 ${width/2} 0.65"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="leg2">
+    <inertial>
+      <mass value="15.64"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.035581" ixy="0.0" ixz="0.0" iyy="0.035581" iyz="0.0" izz="0.012512"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+        <!--mesh filename="package://thorvald_base/meshes/top_chassis.dae"/-->
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="steering2" type="continuous">
+    <parent link="base_link"/>
+    <child link="leg2"/>
+    <origin rpy="0 0 0" xyz="0.67792 ${width/2} 0.2"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="10000"/>
+  </joint>
+  <transmission name="steering2_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="steering2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="steering2_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
+  <link name="wheel2_link">
+    <inertial>
+      <mass value="6.0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0728" ixy="0.0" ixz="0.0" iyy="0.0728" iyz="0.0" izz="0.12"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wheel2_link">
+    <material>Gazebo/Black</material>
+    <mu1 value="2"/>
+    <mu2 value="2"/>
+  </gazebo>
+  <joint name="wheel2" type="continuous">
+    <parent link="leg2"/>
+    <child link="wheel2_link"/>
+    <origin rpy="-1.57079632679 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="1000"/>
+  </joint>
+  <transmission name="wheel2_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wheel2_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <link name="top3">
+    <inertial>
+      <mass value="10.21"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.187252250833" ixy="0.0" ixz="0.0" iyy="0.209836770833" iyz="0.0" izz="0.119499541667"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-MIRROR-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/tower_modules/DUMMY-TOWER-MIRROR-M.stl"/>
+        <box size="0.265 0.209 0.42"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="base_linktop3" type="fixed">
+    <parent link="base_link"/>
+    <child link="top3"/>
+    <origin rpy="0 0 3.14159265359" xyz="-0.67792 ${width/2} 0.65"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="leg3">
+    <inertial>
+      <mass value="15.64"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.035581" ixy="0.0" ixz="0.0" iyy="0.035581" iyz="0.0" izz="0.012512"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 3.14159265359" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-MIRROR-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+        <!--mesh filename="package://thorvald_base/meshes/top_chassis.dae"/-->
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 3.14159265359" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/drive_modules/836745-5-DUMMY-MIRROR-RevA.stl"/>
+        <cylinder length="-0.15" radius="0.04"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="steering3" type="continuous">
+    <parent link="base_link"/>
+    <child link="leg3"/>
+    <origin rpy="0 0 0" xyz="-0.67792 ${width/2} 0.2"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="10000"/>
+  </joint>
+  <transmission name="steering3_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="steering3">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="steering3_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
+  <link name="wheel3_link">
+    <inertial>
+      <mass value="6.0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0728" ixy="0.0" ixz="0.0" iyy="0.0728" iyz="0.0" izz="0.12"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.16" radius="0.2"/>
+        <!-- <box size = "0.00001 0.00001 0.00001"/> -->
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="wheel3_link">
+    <material>Gazebo/Black</material>
+    <mu1 value="2"/>
+    <mu2 value="2"/>
+  </gazebo>
+  <joint name="wheel3" type="continuous">
+    <parent link="leg3"/>
+    <child link="wheel3_link"/>
+    <origin rpy="-1.57079632679 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="100" friction="1000"/>
+  </joint>
+  <transmission name="wheel3_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel3">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wheel3_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+   
+  <link name="corner0_1">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner0_2">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner0">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001807125" ixy="0.0" ixz="0.0" iyy="0.001807125" iyz="0.0" izz="0.000183"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+        <!-- <box size = "0.00001 0.00001 0.00001" /> -->
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner0_link_1" type="fixed">
+    <parent link="corner0"/>
+    <child link="corner0_1"/>
+    <origin rpy="0 0 0" xyz="0.057 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner0_link_2" type="fixed">
+    <parent link="corner0"/>
+    <child link="corner0_2"/>
+    <origin rpy="0 0 0" xyz="0.057 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="corner0_3">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner0_4">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner0_link_3" type="fixed">
+    <parent link="corner0"/>
+    <child link="corner0_3"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner0_link_4" type="fixed">
+    <parent link="corner0"/>
+    <child link="corner0_4"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner0_link" type="fixed">
+    <parent link="base_link"/>
+    <child link="corner0"/>
+    <origin rpy="0 0 -3.14159265359" xyz="-0.368 ${-width/2} 0.68221"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="corner1_1">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner1_2">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner1">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001807125" ixy="0.0" ixz="0.0" iyy="0.001807125" iyz="0.0" izz="0.000183"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+        <!-- <box size = "0.00001 0.00001 0.00001" /> -->
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner1_link_1" type="fixed">
+    <parent link="corner1"/>
+    <child link="corner1_1"/>
+    <origin rpy="0 0 0" xyz="0.057 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner1_link_2" type="fixed">
+    <parent link="corner1"/>
+    <child link="corner1_2"/>
+    <origin rpy="0 0 0" xyz="0.057 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="corner1_3">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner1_4">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner1_link_3" type="fixed">
+    <parent link="corner1"/>
+    <child link="corner1_3"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner1_link_4" type="fixed">
+    <parent link="corner1"/>
+    <child link="corner1_4"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner1_link" type="fixed">
+    <parent link="base_link"/>
+    <child link="corner1"/>
+    <origin rpy="0 0 0" xyz="0.368 ${-width/2} 0.68221"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="corner2_1">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner2_2">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner2">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001807125" ixy="0.0" ixz="0.0" iyy="0.001807125" iyz="0.0" izz="0.000183"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+        <!-- <box size = "0.00001 0.00001 0.00001" /> -->
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner2_link_1" type="fixed">
+    <parent link="corner2"/>
+    <child link="corner2_1"/>
+    <origin rpy="0 0 0" xyz="0.057 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner2_link_2" type="fixed">
+    <parent link="corner2"/>
+    <child link="corner2_2"/>
+    <origin rpy="0 0 0" xyz="0.057 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="corner2_3">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner2_4">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner2_link_3" type="fixed">
+    <parent link="corner2"/>
+    <child link="corner2_3"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner2_link_4" type="fixed">
+    <parent link="corner2"/>
+    <child link="corner2_4"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner2_link" type="fixed">
+    <parent link="base_link"/>
+    <child link="corner2"/>
+    <origin rpy="0 0 0" xyz="0.368 ${width/2} 0.68221"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="corner3_1">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner3_2">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001282525" ixy="0.0" ixz="0.0" iyy="0.001751005" iyz="0.0" izz="0.002989"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-T-BRACKET.stl"/>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.140 0.116 0.058"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner3">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.001807125" ixy="0.0" ixz="0.0" iyy="0.001807125" iyz="0.0" izz="0.000183"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+        <!-- <box size = "0.00001 0.00001 0.00001" /> -->
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.15" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner3_link_1" type="fixed">
+    <parent link="corner3"/>
+    <child link="corner3_1"/>
+    <origin rpy="0 0 0" xyz="0.057 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner3_link_2" type="fixed">
+    <parent link="corner3"/>
+    <child link="corner3_2"/>
+    <origin rpy="0 0 0" xyz="0.057 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="corner3_3">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="corner3_4">
+    <inertial>
+      <mass value="0.915"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.00149976125" ixy="0.0" ixz="0.0" iyy="0.0018795625" iyz="0.0" izz="0.0036638125"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/clamps/DUMMY-SUSP.stl"/>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.155 0.138 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="corner3_link_3" type="fixed">
+    <parent link="corner3"/>
+    <child link="corner3_3"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 -0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner3_link_4" type="fixed">
+    <parent link="corner3"/>
+    <child link="corner3_4"/>
+    <origin rpy="0 0.25 0" xyz="0.1 0 0.075"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="corner3_link" type="fixed">
+    <parent link="base_link"/>
+    <child link="corner3"/>
+    <origin rpy="0 0 -3.14159265359" xyz="-0.368 ${width/2} 0.68221"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="pipe0_1">
+    <inertial>
+      <mass value="1"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0603083333333" ixy="0.0" ixz="0.0" iyy="0.0603083333333" iyz="0.0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="pipe0_2">
+    <inertial>
+      <mass value="1"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0603083333333" ixy="0.0" ixz="0.0" iyy="0.0603083333333" iyz="0.0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="pipe0_link_1" type="fixed">
+    <parent link="base_link"/>
+    <child link="pipe0_1"/>
+    <origin rpy="1.57079632679 0 -1.57079632679" xyz="0.0 ${-width/2} 0.60721"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="pipe0_link_2" type="fixed">
+    <parent link="base_link"/>
+    <child link="pipe0_2"/>
+    <origin rpy="1.57079632679 0 -1.57079632679" xyz="0.0 ${-width/2} 0.75721"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="pipe2_1">
+    <inertial>
+      <mass value="1"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0603083333333" ixy="0.0" ixz="0.0" iyy="0.0603083333333" iyz="0.0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <link name="pipe2_2">
+    <inertial>
+      <mass value="1"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0603083333333" ixy="0.0" ixz="0.0" iyy="0.0603083333333" iyz="0.0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+      <material name="alu"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.85" radius="0.02"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="pipe2_link_1" type="fixed">
+    <parent link="base_link"/>
+    <child link="pipe2_1"/>
+    <origin rpy="1.57079632679 0 1.57079632679" xyz="0.0 ${width/2} 0.60721"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="pipe2_link_2" type="fixed">
+    <parent link="base_link"/>
+    <child link="pipe2_2"/>
+    <origin rpy="1.57079632679 0 1.57079632679" xyz="0.0 ${width/2} 0.75721"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="bat0">
+    <inertial>
+      <mass value="12.88"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <inertia ixx="0.342507106667" ixy="0.0" ixz="0.0" iyy="0.579579606667" iyz="0.0" izz="0.602998666667"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/bat_enc_modules/836586-1-DUMMY-RevA.stl"/>
+        <box size="0.530 0.245 0.509"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/bat_enc_modules/836586-1-DUMMY-RevA.stl"/>
+        <box size="0.530 0.245 0.509"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="bat0_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="bat0"/>
+    <origin rpy="0 0 3.14159265359" xyz="0.0 ${width/2} 0.75721"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <link name="bat1">
+    <inertial>
+      <mass value="12.88"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <inertia ixx="0.342507106667" ixy="0.0" ixz="0.0" iyy="0.579579606667" iyz="0.0" izz="0.602998666667"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/bat_enc_modules/836586-1-DUMMY-RevA.stl"/>
+        <box size="0.530 0.245 0.509"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://oxar_is_bored/meshes/bat_enc_modules/836586-1-DUMMY-RevA.stl"/>
+        <box size="0.530 0.245 0.509"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="bat1_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="bat1"/>
+    <origin rpy="0 0 0" xyz="0.0 ${-width/2} 0.75721"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/thorvald</robotNamespace>
+    </plugin>
+  </gazebo>
+
+
+</robot>
+
+

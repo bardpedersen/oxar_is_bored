@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="macros">
+
+
+    <!-- Import thorvald parts -->
+    <xacro:include filename="thorvald_base.urdf.xacro"/>
+    <xacro:include filename="thorvald_arc.urdf.xacro"/>
+
+    <!-- Create arc -->
+    <xacro:thorvald_arc xyz="-0.5 0 0.5"/>
+
+</robot>

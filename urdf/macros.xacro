@@ -9,7 +9,7 @@
         <link name="${name}">
             <visual>
                 <geometry>
-                    <mesh filename="package://oxar_is_bored/mesh/${filename}" scale="0.001 0.001 0.001"/>
+                    <mesh filename="package://oxar_is_bored/meshes/${filename}" scale="0.001 0.001 0.001"/>
                 </geometry>
                 <xacro:white_material/>
             </visual>
