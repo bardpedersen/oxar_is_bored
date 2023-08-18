@@ -1,6 +1,19 @@
 <launch>
 
-    <node name="bag_record_right" pkg="oxar_is_bored" type="bag_record_right.py" output="screen" />
-    <node name="time_recive_right" pkg="oxar_is_bored" type="time_reciver_right.py" output="screen" />
+    <arg name="node_name1" default="time_recive_right" /> 
+    <arg name="topic_name" default="clock_sync_right" />
 
-<launch/>
+    <node name="$(arg node_name1)" pkg="oxar_is_bored" type="time_reciver.py" output="screen">
+        <param name="topic_sync" value="$(arg topic_name)" />
+    </node>
+
+    <arg name="node_name2" default="bag_record_right" />
+    <arg name="save_as" default="/home/noronn/catkin_ws/src/oxar_is_bored/bags/test_right.bag" />
+    <arg name="topics" default="tf_static,camera_r1/color/camera_info,camera_r2/color/camera_info,camera_r1/color/image_raw,camera_r2/color/image_raw,camera_r1/depth/color/points,camera_r2/depth/color/points,clock_sync,clock_sync_right" />
+
+    <node name="$(arg node_name2)" pkg="oxar_is_bored" type="bag_record.py" output="screen">
+        <param name="save_as" value="$(arg save_as)" />
+        <param name="topics" value="$(arg topics)" />
+    </node>
+
+</launch>
