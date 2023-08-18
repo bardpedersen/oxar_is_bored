@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="macros">
+
+    <!-- Import thorvald parts -->
+    <xacro:include filename="arm.xacro"/>
+
+    <!-- Base link -->
+    <link name="base_link"/>
+
+    <!-- Arm1 -->
+    <xacro:thorvald_arm name="arm_1" parent="base_link" xyz="0.05 0.55 1.2" rpy="0 0 3.14"/>
+
+</robot>

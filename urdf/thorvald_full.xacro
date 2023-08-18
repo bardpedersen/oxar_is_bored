@@ -5,8 +5,15 @@
     <!-- Import thorvald parts -->
     <xacro:include filename="thorvald_base.urdf.xacro"/>
     <xacro:include filename="thorvald_arc.urdf.xacro"/>
+    <xacro:include filename="arm.xacro"/>
 
-    <!-- Create arc -->
-    <xacro:thorvald_arc xyz="-0.5 0 0.5"/>
+    <!-- Arc -->
+    <xacro:thorvald_arc name="arc_link" xyz="-0.5 0 0.5"/>
+    
+    <!-- Arm1 -->
+    <xacro:thorvald_arm name="armL" parent="arc_link" xyz="0.55 -0.55 0.2" rpy="0 0 0"/>
+
+    <!-- Arm2 -->
+    <xacro:thorvald_arm name="armR" parent="arc_link" xyz="0.55 0.55 0.2" rpy="0 0 3.14"/>
 
 </robot>

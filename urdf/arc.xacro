@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="thorvald_arm">
+
+  <!-- Import the materials -->
+  <xacro:include filename="materials.xacro"/>
+  <xacro:include filename="macros.xacro"/>
+
+  <!-- Base Link -->
+  <link name="base_link"/>
+
+  <!-- Arc -->
+  <xacro:stl name="arc" filename="Arc.stl"/>
+  <joint name="arc_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="arc"/>
+    <origin xyz="-0.5 0 0.5" rpy="0 0 0"/>
+  </joint>
+
+</robot>
