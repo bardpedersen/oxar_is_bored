@@ -20,7 +20,9 @@ function run_ros_launch_in_xterm() {
 }
 
 # Run ROS launch files in new xterm terminals
+run_ros_launch_in_xterm "oxar_is_bored distance_sensors.launch"
 run_ros_launch_in_xterm "harvester harvester_arm2.launch" 
 run_ros_launch_in_xterm "oxar_is_bored end_effector2.launch"
 run_ros_launch_in_xterm "realsense2_camera rs_camera.launch camera:=camera_l1 serial_no:=746112060879 filters:=pointcloud initial_reset:=true depth_fps:=15 color_fps:=15"
 run_ros_launch_in_xterm "realsense2_camera rs_camera.launch camera:=camera_l2 serial_no:=825312073170 filters:=pointcloud initial_reset:=true depth_fps:=15 color_fps:=15"
+run_ros_launch_in_xterm "oxar_is_bored bag_record_left.launch"
