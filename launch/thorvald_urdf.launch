@@ -1,0 +1,32 @@
+<launch>
+
+  <!-- Thorvald -->
+  <group ns="thorvald">
+    <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/thorvald.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  </group>
+
+  <!-- Arc -->
+  <group ns="arc">
+    <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/arc.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  </group>
+
+  <!-- Arm 1 -->
+  <group ns="arm_1">
+    <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/arm_1.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  </group>
+
+  <!-- Arm 2 -->
+  <group ns="arm_2">
+    <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/arm_2.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  </group>
+
+  <!-- Animate -->
+  <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_urdf.rviz" />
+
+</launch>
