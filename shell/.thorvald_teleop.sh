@@ -18,7 +18,7 @@ function run_ros_launch_in_xterm() {
 # Run ROS launch files in new gnome terminals
 # These files need to be launched before the arms are launched
 run_ros_launch_in_xterm "temp_launch thorvald_bringup_remote.launch"
-run_ros_launch_in_xterm "thorvald_tunnel_localization aruco_localization.launch"
+#run_ros_launch_in_xterm "thorvald_tunnel_localization aruco_localization.launch"
 
 # Function to check if network is up
 check_network() {
