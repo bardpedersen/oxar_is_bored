@@ -1,6 +1,19 @@
 <launch>
 
-    <node name="bag_record_nuc" pkg="oxar_is_bored" type="bag_record_nuc.py" output="screen" />
-    <node name="time_recive_nuc" pkg="oxar_is_bored" type="time_reciver_nuc.py" output="screen" />
+    <arg name="node_name1" default="time_recive_nuc" /> 
+    <arg name="topic_name" default="clock_sync_nuc" />
 
-<launch/>
+    <node name="$(arg node_name1)" pkg="oxar_is_bored" type="time_reciver.py" output="screen">
+        <param name="topic_sync" value="$(arg topic_name)" />
+    </node>
+
+    <arg name="node_name2" default="bag_record_nuc" />
+    <arg name="save_as" default="/home/bard/catkin_ws/src/oxar_is_bored/bags/test_nuc.bag" />
+    <arg name="topics" default="tf_static,usb_cam_0/camera_info,usb_cam_0/image_raw/compressed,clock_sync,clock_sync_nuc" />
+
+    <node name="$(arg node_name2)" pkg="oxar_is_bored" type="bag_record.py" output="screen">
+        <param name="save_as" value="$(arg save_as)" />
+        <param name="topics" value="$(arg topics)" />
+    </node>
+
+</launch>

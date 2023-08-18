@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import rospy
 import subprocess
 from std_msgs.msg import Empty
@@ -11,9 +12,12 @@ def start_stop_recording_callback(msg):
     global recording_process, is_recording
     if not is_recording:
         try:
-            # Start rosbag recording for nuc camera
-            recording_process = subprocess.Popen(['rosbag', 'record', 'tf_static', 'usb_cam_0/camera_info', 'usb_cam_0/image_raw/compressed','/clock_sync', '/clock_sync_n', '-o', 'test_nuc.bag'])
-            rospy.loginfo("Recording for nuc camera started")
+            # Start rosbag recording for nuc pc
+            topics = rospy.get_param('~topics', '')
+            save_as = rospy.get_param('~save_as', '')
+            command = ['rosbag', 'record'] + topics.split(',') + ['-o'] + save_as.split(',')
+            recording_process = subprocess.Popen(command)            
+            rospy.loginfo("Recording for started")
             is_recording = True
         except Exception as e:
             rospy.logerr("Error starting recording: %s", str(e))
@@ -24,13 +28,14 @@ def start_stop_recording_callback(msg):
                 recording_process.terminate()
                 recording_process.wait()
                 recording_process = None
-                rospy.loginfo("Recording for nuc camera stopped")
+                rospy.loginfo("Recording stopped")
                 is_recording = False
             except Exception as e:
                 rospy.logerr("Error stopping recording: %s", str(e))
 
 if __name__ == '__main__':
-    rospy.init_node('remote_recorder_nuc')
+    node_name = sys.argv[1]
+    rospy.init_node(node_name)
     start_stop_subscriber = rospy.Subscriber('/start_recording_bag', Empty, start_stop_recording_callback)
-    rospy.loginfo("Remote recorder node for nuc camera is ready.")
+    rospy.loginfo("Remote recorder node is ready.")
     rospy.spin()
