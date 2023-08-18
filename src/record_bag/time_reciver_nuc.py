@@ -15,6 +15,6 @@ class RosbagSynchronizer:
 
 if __name__ == '__main__':
     try:
-        synchronizer = RosbagSynchronizer("/clock_sync_n")
+        synchronizer = RosbagSynchronizer("/clock_sync_nuc")
     except rospy.ROSInterruptException:
         pass
