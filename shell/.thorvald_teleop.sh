@@ -31,7 +31,14 @@ while ! check_network; do
 done
 
 # Function to run ROS launch file in a new gnome terminal
+function run_ros_launch_in_xterm() {
+  gnome-terminal -- bash -ic "source $HOME/.bashrc; roslaunch $1; exec bash" &
+  sleep 5
+}
+
+# Function to run ROS launch file in a new gnome terminal
 # This file needs to be launched after the network is up
-gnome-terminal -- bash -c "source $HOME/.bashrc; roslaunch oxar_is_bored teleop_arm_and_wheels.launch; exec bash" &
+run_ros_launch_in_xterm "oxar_is_bored teleop_arm_and_wheels.launch"
+run_ros_launch_in_xterm "oxar_is_bored bag_record_nuc.launch"
 
 
