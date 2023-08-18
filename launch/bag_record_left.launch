@@ -1,0 +1,6 @@
+<launch>
+
+    <node name="bag_record_left" pkg="oxar_is_bored" type="bag_record_left.py" output="screen" />
+    <node name="time_recive_left" pkg="oxar_is_bored" type="time_reciver_left.py" output="screen" />
+
+<launch/>

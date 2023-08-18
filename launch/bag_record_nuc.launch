@@ -1,0 +1,6 @@
+<launch>
+
+    <node name="bag_record_nuc" pkg="oxar_is_bored" type="bag_record_nuc.py" output="screen" />
+    <node name="time_recive_nuc" pkg="oxar_is_bored" type="time_reciver_nuc.py" output="screen" />
+
+<launch/>
