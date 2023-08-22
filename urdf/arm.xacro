@@ -64,6 +64,14 @@
             <axis xyz="0 1 0"/>
             <limit effort="10.0" velocity="1.0" lower="-2" upper="2"/>
         </joint>
+
+        <link name="${name}_end_effector_link"/>
+        <joint name="${name}_joint_6" type="fixed">
+            <parent link="${name}_end2_link"/>
+            <child link="${name}_end_effector_link"/>
+            <origin xyz="0.04 -0.016 0" rpy="0 0 0"/>
+        </joint>
+
     </xacro:macro>
 
 </robot>
