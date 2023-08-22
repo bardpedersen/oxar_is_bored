@@ -3,9 +3,9 @@
 <launch>
 
     <!-- Synced -->
-    <node pkg="rosbag" type="play" name="player_left" output="screen" args="-l $(find thorvald_tunnel_localization)/bags/oxar/left.bag"/>
-    <node pkg="rosbag" type="play" name="player_nuc" output="screen" args="-l $(find thorvald_tunnel_localization)/bags/oxar/nuc.bag"/>
-    <node pkg="rosbag" type="play" name="player_right" output="screen" args="-l $(find thorvald_tunnel_localization)/bags/oxar/right.bag"/>
+    <node pkg="rosbag" type="play" name="player_left" output="screen" args="-l $(find thorvald_tunnel_localization)/bags/test_left_22.bag"/>
+    <node pkg="rosbag" type="play" name="player_nuc" output="screen" args="-l $(find thorvald_tunnel_localization)/bags/test_nuc_22.bag"/>
+    <node pkg="rosbag" type="play" name="player_right" output="screen" args="-l $(find thorvald_tunnel_localization)/bags/test_right_22.bag"/>
     
     <!-- Original -->
     <!-- <node pkg="rosbag" type="play" name="player_left" output="screen" args="-l $(find thorvald_tunnel_localization)/bags/un_synced/test_left.bag"/>
