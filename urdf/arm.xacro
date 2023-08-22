@@ -75,7 +75,11 @@
 
         <link name="${name}_end_effector_link"/>
         <joint name="${name}_joint_6" type="fixed">
+<<<<<<< HEAD
             <parent link="${name}_tilt_link"/>
+=======
+            <parent link="${name}_end2_link"/>
+>>>>>>> 0a74866... Add markers to end effector
             <child link="${name}_end_effector_link"/>
             <origin xyz="0.04 -0.016 0" rpy="0 0 0"/>
         </joint>
