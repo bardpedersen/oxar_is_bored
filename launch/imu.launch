@@ -1,6 +1,0 @@
-<launch>
-
-  <include file="$(find xsens_mti_driver)/launch/display.launch">
-  </include>
-  
-</launch>

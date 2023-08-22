@@ -40,5 +40,6 @@ function run_ros_launch_in_xterm() {
 # This file needs to be launched after the network is up
 run_ros_launch_in_xterm "oxar_is_bored teleop_arm_and_wheels.launch"
 run_ros_launch_in_xterm "oxar_is_bored bag_record_nuc.launch"
+run_ros_launch_in_xterm "xsens_driver xsens_driver.launch"
 
 
