@@ -27,7 +27,13 @@
     <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
   </group>
 
-  <!-- publish trajectory markers -->
+  <!-- Aruco camera calibration -->
+  <group ns="aruco_calibration">
+    <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/calibration_all.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  </group>
+
+  <!-- Publish trajectory markers -->
   <node name="trajectory_1_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
   args="base_link arm_1_end_effector_link arm_1_trajectory [0,0,1,0.8] 0 0.01 10"/>
 
