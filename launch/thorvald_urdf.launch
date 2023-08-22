@@ -25,6 +25,12 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   </group>
 
+  <!-- Aruco camera calibration -->
+  <group ns="aruco_calibration">
+    <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/calibration_all.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  </group>
+
   <!-- Animate -->
   <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_urdf.rviz" />
