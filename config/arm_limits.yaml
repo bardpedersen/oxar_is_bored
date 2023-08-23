@@ -33,8 +33,8 @@ sinus_speed_x: 1
 sinus_y: 200
 
 # Params for the cosinusodal movement, where the first value is the start and end position for the x axis, the second is the speed for the x axis, the third is the start and end position for the z axis and the fourth is the speed for the z axis, the fifth is the y position
-cosinus_x_start_end: [-21, 279]
+cosinus_x_start_end: [0, 300]
 cosinus_speed_x: 1
-cosinus_z_start_end: [99, 399]
+cosinus_z_start_end: [100, 300]
 cosinus_speed_z: 2
 cosinus_y: 200
