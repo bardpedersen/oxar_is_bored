@@ -9,7 +9,7 @@
 
     <arg name="node_name2" default="bag_record_nuc" />
     <arg name="save_as" default="/home/thorvald/temp_ws/src/oxar_is_bored/bags/test_nuc.bag" />
-    <arg name="topics" default="tf_static,usb_cam_0/camera_info,usb_cam_0/image_raw/compressed,clock_sync,clock_sync_nuc" />
+    <arg name="topics" default="tf_static,usb_cam_0/camera_info, usb_cam_0/image_raw/compressed, usb_cam_1/camera_info,usb_cam_1/image_raw/compressed, odometry/base_raw, odometry/filtered/local, imu/data " />
 
     <node name="$(arg node_name2)" pkg="oxar_is_bored" type="bag_record.py" output="screen">
         <param name="save_as" value="$(arg save_as)" />
