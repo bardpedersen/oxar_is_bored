@@ -36,8 +36,8 @@ class TeleopNode:
         self.cosinus_forward = True
         self.cosinus_upward = True
         self.sinus_x_number = 0
-        self.cosinus_x_number = 0
-        self.cosinus_z_number = 0
+        self.cosinus_x_number = 200
+        self.cosinus_z_number = 200
         self.away_statement = 0
         self.previous_button_pressed = [0] * len(self.button_mapping)
         self.arm_speed_control = 2
@@ -156,14 +156,14 @@ class TeleopNode:
     def arm_endef_angle1(self, data):
         if not self.endeffector1_initiated:
             angles = np.degrees(data.data)
-            self.end_effector1_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
-                                                         self.max_x_end_effector)
+            #self.end_effector1_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
+                                                         #self.max_x_end_effector)
 
     def arm_endef_angle2(self, data):
         if not self.endeffector2_initiated:
             angles = np.degrees(data.data)
-            self.end_effector2_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
-                                                         self.max_x_end_effector)
+            #self.end_effector2_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
+                                                         #self.max_x_end_effector)
 
     # Calls safety stop service to stop arms
     def safety_stop(self):
@@ -347,18 +347,11 @@ class TeleopNode:
 
     # Function for moving the arm cosinusodial
     def move_arm_cosinusodial(self, pos):
-        # Checks if the arm should move forward or backward
-        if self.cosinus_forward:
-            self.cosinus_x_number += self.cosinus_speed_x
-        if not self.cosinus_forward:
-            self.cosinus_x_number -= self.cosinus_speed_x
 
-        # Checks if the arm should move upward or downward
-        if self.cosinus_upward:
-            self.cosinus_z_number -= self.cosinus_speed_z
-        if not self.cosinus_upward:
-            self.cosinus_z_number += self.cosinus_speed_z
-
+        x_p = 100
+        y_p = 200
+        r = 100
+        
         # Checks if the arm should have reached the end of the movement, if so change direction
         if self.cosinus_x_number > self.cosinus_x_start_end[1]:
             self.cosinus_forward = False
@@ -366,11 +359,32 @@ class TeleopNode:
         if self.cosinus_x_number < self.cosinus_x_start_end[0]:
             self.cosinus_forward = True
 
-        if self.cosinus_z_number > self.cosinus_z_start_end[1]:
-            self.cosinus_upward = True
+        # Checks if the arm should move forward or backward
+        if self.cosinus_forward:
+            self.cosinus_x_number += self.cosinus_speed_x
+        """
+        if self.cosinus_x_number >= x_p:
+                self.cosinus_x_number += 0.2 + (1 - (self.cosinus_x_number - self.cosinus_x_start_end[1]))/self.cosinus_x_start_end[1]
+        if self.cosinus_x_number < x_p:
+        self.cosinus_x_number += 0.2 + (1 - (self.cosinus_x_start_end[0] - self.cosinus_x_number))/self.cosinus_x_start_end[1]
+        """
 
-        if self.cosinus_z_number < self.cosinus_z_start_end[0]:
-            self.cosinus_upward = False
+        if not self.cosinus_forward:
+            self.cosinus_x_number -= self.cosinus_speed_x
+        """
+        if self.cosinus_x_number >= x_p:
+                self.cosinus_x_number -= 0.2 + (1 - (self.cosinus_x_number - self.cosinus_x_start_end[1]))/self.cosinus_x_start_end[1]
+        if self.cosinus_x_number < x_p:
+        self.cosinus_x_number -= 0.2 + (1 - (self.cosinus_x_start_end[0] - self.cosinus_x_number))/self.cosinus_x_start_end[1]
+        """
+        x_norm = float(self.cosinus_x_number)/float(self.cosinus_x_start_end[1])*np.pi*2
+
+        # Checks if the arm should move upward or downward
+        if self.cosinus_forward:
+            self.cosinus_z_number = 200 + 80 * np.sin(x_norm)
+        if not self.cosinus_forward:
+            self.cosinus_z_number = 200 - 80 * np.sin(x_norm)
+	
 
         pos[0] = self.cosinus_x_number
         pos[1] = self.cosinus_y
@@ -485,6 +499,7 @@ class TeleopNode:
                     elif self.away_statement == 2:
                         rospy.loginfo("Status: Away")
                     elif self.away_statement == 3:
+                        self.arm_movement = rospy.get_param('/arm_movement')
                         rospy.loginfo("Status: Move preset")
                     elif self.away_statement == 4:
                         rospy.loginfo("Status: Move sinusodial")
