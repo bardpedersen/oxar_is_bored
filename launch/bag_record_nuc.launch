@@ -1,19 +1,14 @@
 <launch>
 
-    <arg name="node_name1" default="time_recive_nuc" /> 
-    <arg name="topic_name" default="clock_sync_nuc" />
-
-    <node name="$(arg node_name1)" pkg="oxar_is_bored" type="time_reciver.py" output="screen">
-        <param name="topic_sync" value="$(arg topic_name)" />
-    </node>
-
     <arg name="node_name2" default="bag_record_nuc" />
     <arg name="save_as" default="/home/thorvald/temp_ws/src/oxar_is_bored/bags/test_nuc.bag" />
-    <arg name="topics" default="tf_static,usb_cam_0/camera_info, usb_cam_0/image_raw/compressed, usb_cam_1/camera_info,usb_cam_1/image_raw/compressed, odometry/base_raw, odometry/filtered/local, imu/data " />
+    <arg name="topics_record" default="tf_static,usb_cam_0/camera_info,usb_cam_0/image_raw/compressed,usb_cam_1/camera_info,usb_cam_1/image_raw/compressed,odometry/base_raw,odometry/filtered/local,imu/data,velocity" />
+    <arg name="topics_calib" default="" />
 
     <node name="$(arg node_name2)" pkg="oxar_is_bored" type="bag_record.py" output="screen">
         <param name="save_as" value="$(arg save_as)" />
-        <param name="topics" value="$(arg topics)" />
+        <param name="topics_record" value="$(arg topics_record)" />
+        <param name="topics_calib" value="$(arg topics_calib)" />
     </node>
 
 </launch>
