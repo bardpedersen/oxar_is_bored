@@ -9,7 +9,7 @@
 
     <arg name="node_name2" default="bag_record_right" />
     <arg name="save_as" default="/home/noronn/catkin_ws/src/oxar_is_bored/bags/test_right.bag" />
-    <arg name="topics" default="tf_static,camera_r1/color/camera_info,camera_r2/color/camera_info,camera_r1/color/image_raw,camera_r2/color/image_raw,camera_r1/depth/color/points,camera_r2/depth/color/points,clock_sync,clock_sync_right" />
+    <arg name="topics" default="tf_static,camera_r1/color/camera_info,camera_r2/color/camera_info,camera_r1/color/image_raw,camera_r2/color/image_raw,camera_r1/depth/color/points,camera_r2/depth/color/points" />
 
     <node name="$(arg node_name2)" pkg="oxar_is_bored" type="bag_record.py" output="screen">
         <param name="save_as" value="$(arg save_as)" />
