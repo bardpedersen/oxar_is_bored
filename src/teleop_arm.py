@@ -643,4 +643,10 @@ Can co both sinus and cosine at same time. remove.
 End effector error if moved to fast
 Safety always working?
 Calibration at the same time, error
+
+
+Add en_effector pre move to 9 places, wait 5secunds in each place.
+
+
+Change arm1_calib_strech, endeffector
 """
