@@ -1,1 +1,0 @@
-/camera_r1/color/camera_info /camera_r1/color/image_raw /camera_r2/color/camera_info /camera_r2/color/image_raw /camera_l1/color/camera_info /camera_l1/color/image_raw /camera_l2/color/camera_info /camera_l2/color/image_raw /tf_static
