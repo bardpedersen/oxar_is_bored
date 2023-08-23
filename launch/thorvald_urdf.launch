@@ -44,6 +44,9 @@
   <node name="trajectory_3_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
   args="base_link arm_2_end_effector_link arm_2_trajectory [1,0,0,0.8] 0 0.01 20"/>
   
+  <node name="trajectory_3_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
+  args="base_link target_link target_traj [1,0,0,0.8] 0 0.01 10"/>
+  
   <!-- Animate -->
   <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_urdf.rviz" />
