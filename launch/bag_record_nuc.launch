@@ -1,14 +1,16 @@
 <launch>
 
     <arg name="node_name2" default="bag_record_nuc" />
-    <arg name="save_as" default="/home/thorvald/temp_ws/src/oxar_is_bored/bags/test_nuc.bag" />
+    <arg name="save_as" default="/home/thorvald/temp_ws/src/oxar_is_bored/bags/nuc_" />
     <arg name="topics_record" default="tf_static,usb_cam_0/camera_info,usb_cam_0/image_raw/compressed,usb_cam_1/camera_info,usb_cam_1/image_raw/compressed,odometry/base_raw,odometry/filtered/local,imu/data,velocity" />
     <arg name="topics_calib" default="" />
+    <arg name="topics_drive" default="tf_static,odometry/base_raw,odometry/filtered/local,imu/data,velocity,teleop_joy/cmd_vel,nav_vel" />
 
     <node name="$(arg node_name2)" pkg="oxar_is_bored" type="bag_record.py" output="screen">
         <param name="save_as" value="$(arg save_as)" />
         <param name="topics_record" value="$(arg topics_record)" />
         <param name="topics_calib" value="$(arg topics_calib)" />
+        <param name="topics_drive" value="$(arg topics_drive)" />
     </node>
 
 </launch>

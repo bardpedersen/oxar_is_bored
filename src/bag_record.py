@@ -30,16 +30,25 @@ def start_stop_recording_callback(msg):
 
     elif recording_process is not None:
         rospy.logerr("Recording allredy in progress, stop with 'stop' before starting a new one")
-        
-    elif msg.data in ['record', 'calib']:
-        topics = rospy.get_param('~topics_' + msg.data, '')
-        save_as = rospy.get_param('~save_as', '')
+    
+    else:
+        if msg.data == 'calib':
+            topics = rospy.get_param('~topics_calib', '')
+        elif msg.data == 'drive':
+            topics = rospy.get_param('~topics_drive', '')
+        else:
+            topics = rospy.get_param('~topics_record', '')
+
+        save_as = rospy.get_param('~save_as', '') + msg.data
         if topics and save_as:
             start_recording(topics, save_as)
+
+        elif topics and not save_as:
+            rospy.logerr("No save_as parameter provided for recording type '%s'", save_as)
+        elif save_as and not topics:
+            rospy.logerr("No topics parameter provided for recording type '%s'", topics)
         else:
-            rospy.logerr("No topics or save_as parameter provided for recording type '%s'", msg.data)
-    else:
-        rospy.logerr("Invalid recording type: '%s'", msg.data)
+            rospy.logerr("Unknown error '%s'", msg.data)
 
 if __name__ == '__main__':
     node_name = sys.argv[1]
