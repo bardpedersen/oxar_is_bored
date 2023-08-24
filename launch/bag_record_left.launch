@@ -1,7 +1,7 @@
 <launch>
 
     <arg name="node_name" default="bag_record_left" />
-    <arg name="save_as" default="/home/noronn/catkin_ws/src/oxar_is_bored/bags/test_left.bag" />
+    <arg name="save_as" default="/home/noronn/catkin_ws/src/oxar_is_bored/bags/left_" />
     <arg name="topics_calib" default="tf_static,camera_l1/color/camera_info,camera_l2/color/camera_info,camera_l1/color/image_raw/compressed,camera_l2/color/image_raw/compressed" />
     <arg name="topics_record" default="tf_static,camera_l1/color/camera_info,camera_l2/color/camera_info,camera_l1/color/image_raw/compressed,camera_l2/color/image_raw/compressed,camera_l1/depth/color/points,camera_l2/depth/color/points" />
 
