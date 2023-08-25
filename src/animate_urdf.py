@@ -15,12 +15,12 @@ class ArmToJointState:
 
         # Set the joint names and initial positions
         self.joint_state.name = [
-            f'arm_{arm_number}_base_joint',
-            f'arm_{arm_number}_joint_1',
-            f'arm_{arm_number}_joint_2',
-            f'arm_{arm_number}_joint_3',
-            f'arm_{arm_number}_joint_4',
-            f'arm_{arm_number}_joint_5'
+            f'arm{arm_number}_prismatic_joint',
+            f'arm{arm_number}_joint_1',
+            f'arm{arm_number}_joint_2',
+            f'arm{arm_number}_joint_3',
+            f'arm{arm_number}_joint_4',
+            f'arm{arm_number}_joint_5'
         ]
         self.joint_state.position = [0.0] * len(self.joint_state.name)
 

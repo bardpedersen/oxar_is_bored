@@ -8,6 +8,6 @@
     <link name="base_link"/>
 
     <!-- Arm2 -->
-    <xacro:thorvald_arm name="arm_2" parent="base_link" xyz="0.05 -0.55 1.2" rpy="0 0 0"/>
+    <xacro:thorvald_arm name="arm2" parent="base_link" xyz="0.05 -0.55 1.2" rpy="0 0 0"/>
 
 </robot>
