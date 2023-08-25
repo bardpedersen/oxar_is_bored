@@ -26,7 +26,12 @@ end_position_z: 500
 
 # Prew set path for the arms, where the first value is the x position, the second is the y position and the third is the z position
 arm_movement: [[0, 200, 300],[0, 200, 400],[0, 200, 500],[0, 200, 200],[100, 200, 400]]
+<<<<<<< HEAD
 endeff_movement: [[90, 90],[60, 60],[120, 60],[120, 120],[60, 120],[90, 90]]
+=======
+# Prew set path for the end effectors, where the first value is tilt(second servo) and the second is pan(first servo)
+endeff_movement: [[90, 90],[60, 90],[60, 120],[90, 120],[120, 120],[120, 90],[120, 60],[90, 60],[60, 60],[60, 90],[90, 90]]
+>>>>>>> b10cc71... test
 
 # Params for the sinusodal movement, where the first value is the start and end position for the x axis, the second is the speed for the x axis, the third is the y position
 sinus_x_start_end: [-150, 250]

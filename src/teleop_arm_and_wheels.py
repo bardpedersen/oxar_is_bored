@@ -267,155 +267,155 @@ class TeleopNode:
 
     # Loop that keeps the ros node running
     def run(self):
+        # Checks if the joy_data has been received
+        while self.joy_data is None:
+            pass
+        
+
         while not rospy.is_shutdown():
-            # Checks if the joy_data has been received
-            if self.joy_data is not None:
-                # Bypass that RT and LT starts with 0 as default value and default
-                # value changes to 1 when pressed.
-                # Check if the RT and LT buttons have been pressed, first then are they in use
-                if not self.T_buttons_initiated_ and self.joy_data.axes[2] == 1 and \
-                        self.joy_data.axes[5] == 1:
-                    self.T_buttons_initiated_ = True
-                    rospy.loginfo("LT and RT are ready to be used")
+            # Bypass that RT and LT starts with 0 as default value and default value changes to 1 when pressed.
+            # Check if the RT and LT buttons have been pressed, first then are they in use
+            if not self.T_buttons_initiated_ and self.joy_data.axes[2] == 1 and \
+                    self.joy_data.axes[5] == 1:
+                self.T_buttons_initiated_ = True
+                rospy.loginfo("LT and RT are ready to be used")
 
-                # Call services
-                if self.evaluate_button(self.home_steering_button):
-                    self.home_steering()
+            # Call services
+            if self.evaluate_button(self.home_steering_button):
+                self.home_steering()
 
-                # Changes only when x button is pressed, not hold down
-                # Switches between left and right arm
-                if self.evaluate_button(self.activate_arm_button):
-                    self.arm_initiated = (self.arm_initiated + 1) % 4
+            # Changes only when x button is pressed, not hold down
+            # Switches between left and right arm
+            if self.evaluate_button(self.activate_arm_button):
+                self.arm_initiated = (self.arm_initiated + 1) % 4
 
-                    if self.arm_initiated == 0:
-                        rospy.loginfo("No arm activated")
-                    elif self.arm_initiated == 1:
-                        rospy.loginfo("Arm1 activated")
-                    elif self.arm_initiated == 2:
-                        rospy.loginfo("Arm2 activated")
-                    elif self.arm_initiated == 3:
-                        rospy.loginfo("Both arms activated")
+                if self.arm_initiated == 0:
+                    rospy.loginfo("No arm activated")
+                elif self.arm_initiated == 1:
+                    rospy.loginfo("Arm1 activated")
+                elif self.arm_initiated == 2:
+                    rospy.loginfo("Arm2 activated")
+                elif self.arm_initiated == 3:
+                    rospy.loginfo("Both arms activated")
+            
+            # Switches between left and right end effector
+            if self.evaluate_button(self.activate_endef_button):
+                self.endeffector_initiated = (self.endeffector_initiated + 1) % 4
                 
-                # Switches between left and right end effector
-                if self.evaluate_button(self.activate_endef_button):
-                    self.endeffector_initiated = (self.endeffector_initiated + 1) % 4
-                    
-                    if self.endeffector_initiated == 0:
-                        rospy.loginfo("No end effector activated")
-                    elif self.endeffector_initiated == 1:
-                        rospy.loginfo("End effector1 activated")
-                    elif self.endeffector_initiated == 2:
-                        rospy.loginfo("End effector2 activated")
-                    elif self.endeffector_initiated == 3:
-                        rospy.loginfo("Both end effectors activated")
+                if self.endeffector_initiated == 0:
+                    rospy.loginfo("No end effector activated")
+                elif self.endeffector_initiated == 1:
+                    rospy.loginfo("End effector1 activated")
+                elif self.endeffector_initiated == 2:
+                    rospy.loginfo("End effector2 activated")
+                elif self.endeffector_initiated == 3:
+                    rospy.loginfo("Both end effectors activated")
 
-                # Adjust the speed of the arms
-                if self.evaluate_button(self.increase_arm_speed):
-                    self.arm_speed_control += 0.1
-                    self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed,
-                                                     self.arm_max_speed)
-                    rospy.loginfo("Arm speed: %s", self.arm_speed_control)
+            # Adjust the speed of the arms
+            if self.evaluate_button(self.increase_arm_speed):
+                self.arm_speed_control += 0.1
+                self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed,
+                                                    self.arm_max_speed)
+                rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
-                if self.evaluate_button(self.decrease_arm_speed):
-                    self.arm_speed_control -= 0.1
-                    self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed,
-                                                     self.arm_max_speed)
-                    rospy.loginfo("Arm speed: %s", self.arm_speed_control)
+            if self.evaluate_button(self.decrease_arm_speed):
+                self.arm_speed_control -= 0.1
+                self.arm_speed_control = np.clip(self.arm_speed_control, self.arm_min_speed,
+                                                    self.arm_max_speed)
+                rospy.loginfo("Arm speed: %s", self.arm_speed_control)
 
-                # Activates the emergency stop 
-                if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1\
-                        and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]]\
-                        == 1 and not self.L3_R3_button_prev_state:
-                    self.safety_stop_ = not self.safety_stop_
-                    self.safety_stop()
-                    if self.safety_stop_:
-                        rospy.loginfo("Safety Enabled")
-                    else:
-                        rospy.loginfo("Safety Disabled")
-                        
-                if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and \
-                        self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1:
-                    self.L3_R3_button_prev_state = True
+            # Activates the emergency stop 
+            if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1\
+                    and self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]]\
+                    == 1 and not self.L3_R3_button_prev_state:
+                self.safety_stop_ = not self.safety_stop_
+                self.safety_stop()
+                if self.safety_stop_:
+                    rospy.loginfo("Safety Enabled")
                 else:
-                    self.L3_R3_button_prev_state = False
+                    rospy.loginfo("Safety Disabled")
+            
+            # Make sure that the safety stop is not activated/deactivated activily when the buttons are held down
+            if self.joy_data.buttons[self.button_mapping[self.safety_stop_button[0]]] == 1 and \
+                    self.joy_data.buttons[self.button_mapping[self.safety_stop_button[1]]] == 1:
+                self.L3_R3_button_prev_state = True
+            else:
+                self.L3_R3_button_prev_state = False
 
-                # Chooses witch arm and end effector to control with joy
-                if not self.safety_stop_:
-                    if self.endeffector_initiated == 1:
-                        self.end_effector1_angles = self.end_effector(self.end_effector1_angles)
-                    elif self.endeffector_initiated == 2:
-                        self.end_effector2_angles = self.end_effector(self.end_effector2_angles,
-                                                                      left=True)
-                    elif self.endeffector_initiated == 3:
-                        self.end_effector1_angles = self.end_effector(self.end_effector1_angles)
-                        self.end_effector2_angles = self.end_effector(self.end_effector2_angles,
-                                                                      left=True)
+            # Chooses witch arm and end effector to control with joy
+            if not self.safety_stop_:
+                if self.endeffector_initiated == 1:
+                    self.end_effector1_angles = self.end_effector(self.end_effector1_angles)
+                elif self.endeffector_initiated == 2:
+                    self.end_effector2_angles = self.end_effector(self.end_effector2_angles,
+                                                                    left=True)
+                elif self.endeffector_initiated == 3:
+                    self.end_effector1_angles = self.end_effector(self.end_effector1_angles)
+                    self.end_effector2_angles = self.end_effector(self.end_effector2_angles,
+                                                                    left=True)
+                array1 = Int32MultiArray()
+                array1.data = self.end_effector1_angles
+                self.end_effector_pub1.publish(array1)
 
-                    if self.arm_initiated == 1:
-                        self.armposition_1 = self.controll_arm(self.armposition_1)
-                    elif self.arm_initiated == 2:
-                        self.armposition_2 = self.controll_arm(self.armposition_2, left=True)
-                    elif self.arm_initiated == 3:
-                        self.armposition_1 = self.controll_arm(self.armposition_1)
-                        self.armposition_2 = self.controll_arm(self.armposition_2, left=True)
+                array2 = Int32MultiArray()
+                array2.data = self.end_effector2_angles
+                self.end_effector_pub2.publish(array2)
 
-                    array1 = Int32MultiArray()
-                    array1.data = self.end_effector1_angles
-                    self.end_effector_pub1.publish(array1)
+                if self.arm_initiated == 1:
+                    self.armposition_1 = self.controll_arm(self.armposition_1)
+                elif self.arm_initiated == 2:
+                    self.armposition_2 = self.controll_arm(self.armposition_2, left=True)
+                elif self.arm_initiated == 3:
+                    self.armposition_1 = self.controll_arm(self.armposition_1)
+                    self.armposition_2 = self.controll_arm(self.armposition_2, left=True)
 
-                    array2 = Int32MultiArray()
-                    array2.data = self.end_effector2_angles
-                    self.end_effector_pub2.publish(array2)
-                    
-                    if self.arm_initiated == 1 or self.arm_initiated == 3:
-                        joint_state = JointState()
-                        joint_state.position = self.armposition_1
-                        joint_state.velocity = [0.0]
-                        joint_state.effort = [0]
-                        self.arm_posit_pub1.publish(joint_state)
+                if self.arm_initiated == 1 or self.arm_initiated == 3:
+                    joint_state = JointState()
+                    joint_state.position = self.armposition_1
+                    joint_state.velocity = [0.0]
+                    joint_state.effort = [0]
+                    self.arm_posit_pub1.publish(joint_state)
 
-                    if self.arm_initiated == 2 or self.arm_initiated == 3:
-                        joint_state = JointState()
-                        joint_state.position = self.armposition_2
-                        joint_state.velocity = [0.0]
-                        joint_state.effort = [0]
-                        self.arm_posit_pub2.publish(joint_state)
+                if self.arm_initiated == 2 or self.arm_initiated == 3:
+                    joint_state = JointState()
+                    joint_state.position = self.armposition_2
+                    joint_state.velocity = [0.0]
+                    joint_state.effort = [0]
+                    self.arm_posit_pub2.publish(joint_state)
 
-                    # Controls the wheels
-                    if self.evaluate_button(self.increase_drive_speed):
-                        self.speed_controll += 0.1
-                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed,
-                                                      self.drive_max_speed)
-                        rospy.set_param('/linear_velocity', float(self.speed_controll))      
-                        rospy.loginfo("Wheel speed: %s", self.speed_controll)
-                
-                    if self.evaluate_button(self.decrease_drive_speed):
-                        self.speed_controll -= 0.1
-                        self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed,
-                                                      self.drive_max_speed)
-                        rospy.set_param('/linear_velocity', float(self.speed_controll))
-                        rospy.loginfo("Wheel speed: %s", self.speed_controll)
+                # Controls the wheels
+                if self.evaluate_button(self.increase_drive_speed):
+                    self.speed_controll += 0.1
+                    self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed,
+                                                    self.drive_max_speed)
+                    rospy.set_param('/linear_velocity', float(self.speed_controll))      
+                    rospy.loginfo("Wheel speed: %s", self.speed_controll)
+            
+                if self.evaluate_button(self.decrease_drive_speed):
+                    self.speed_controll -= 0.1
+                    self.speed_controll = np.clip(self.speed_controll, self.drive_min_speed,
+                                                    self.drive_max_speed)
+                    rospy.set_param('/linear_velocity', float(self.speed_controll))
+                    rospy.loginfo("Wheel speed: %s", self.speed_controll)
 
-                    if self.joy_data.axes[self.axes_mapping[self.drive_forward]] != 0 or \
-                            self.joy_data.axes[self.axes_mapping[self.drive_turning]] != 0:
-                        twist = Twist()
-                        twist.linear.x = \
-                            self.joy_data.axes[self.axes_mapping[self.drive_forward]] * \
-                            self.speed_controll
-                        twist.angular.z = \
-                            self.joy_data.axes[self.axes_mapping[self.drive_turning]] * \
-                            self.speed_controll
-                        self.cmd_vel_pub.publish(twist)
+                if self.joy_data.axes[self.axes_mapping[self.drive_forward]] != 0 or \
+                        self.joy_data.axes[self.axes_mapping[self.drive_turning]] != 0:
+                    twist = Twist()
+                    twist.linear.x = \
+                        self.joy_data.axes[self.axes_mapping[self.drive_forward]] * \
+                        self.speed_controll
+                    twist.angular.z = \
+                        self.joy_data.axes[self.axes_mapping[self.drive_turning]] * \
+                        self.speed_controll
+                    self.cmd_vel_pub.publish(twist)
 
                 self.previous_button_pressed = self.joy_data.buttons
             self.rate.sleep()
 
 
 if __name__ == '__main__':
-    # Initiate node
     # Initialize the ROS node
     rospy.init_node('teleop_node_arms_wheels')
     Teleop_Node = TeleopNode()
-
     # Keep script running
     Teleop_Node.run()
