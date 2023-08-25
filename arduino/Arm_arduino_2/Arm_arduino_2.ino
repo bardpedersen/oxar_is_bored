@@ -23,8 +23,9 @@ ros::NodeHandle nh;
 // Callback function for the subscriber
 void jointAnglesCallback(const std_msgs::Int32MultiArray& msg) {
   // Set servo angles from corresponding values in the message
-  servo1.write(msg.data[0]);
-  servo2.write(msg.data[1]);
+
+  servo1.write(msg.data[0]+8); //needed for 90 to be straight
+  servo2.write(msg.data[1]); 
 }
 
 // Create a subscriber object

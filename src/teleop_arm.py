@@ -7,6 +7,7 @@ from std_srvs.srv import SetBool, SetBoolRequest
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Int32MultiArray, Float32MultiArray, Bool
 from geometry_msgs.msg import PoseArray
+from time import sleep
 
 
 class TeleopNode:
@@ -32,12 +33,13 @@ class TeleopNode:
         self.safety_stop_ = False
         self.active_sinusodal = False
         self.active_cosinusodal = False
+        self.active_end_effector_move = False
         self.sinus_forward = True
         self.cosinus_forward = True
         self.cosinus_upward = True
         self.sinus_x_number = 0
-        self.cosinus_x_number = 0
-        self.cosinus_z_number = 0
+        self.cosinus_x_number = 200
+        self.cosinus_z_number = 200
         self.away_statement = 0
         self.previous_button_pressed = [0] * len(self.button_mapping)
         self.arm_speed_control = 2
@@ -127,6 +129,7 @@ class TeleopNode:
 
         # List of positions to move
         self.arm_movement = rospy.get_param('arm_movement')
+        self.endeff_movement = rospy.get_param('endeff_movement')
 
         # Variables for sinusoidal movement
         self.sinus_x_start_end = rospy.get_param('sinus_x_start_end')
@@ -156,14 +159,14 @@ class TeleopNode:
     def arm_endef_angle1(self, data):
         if not self.endeffector1_initiated:
             angles = np.degrees(data.data)
-            self.end_effector1_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
-                                                         self.max_x_end_effector)
+            #self.end_effector1_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
+                                                         #self.max_x_end_effector)
 
     def arm_endef_angle2(self, data):
         if not self.endeffector2_initiated:
             angles = np.degrees(data.data)
-            self.end_effector2_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
-                                                         self.max_x_end_effector)
+            #self.end_effector2_angles[1] = 180 - np.clip(angles[0], self.min_x_end_effector,
+                                                         #self.max_x_end_effector)
 
     # Calls safety stop service to stop arms
     def safety_stop(self):
@@ -347,18 +350,11 @@ class TeleopNode:
 
     # Function for moving the arm cosinusodial
     def move_arm_cosinusodial(self, pos):
-        # Checks if the arm should move forward or backward
-        if self.cosinus_forward:
-            self.cosinus_x_number += self.cosinus_speed_x
-        if not self.cosinus_forward:
-            self.cosinus_x_number -= self.cosinus_speed_x
 
-        # Checks if the arm should move upward or downward
-        if self.cosinus_upward:
-            self.cosinus_z_number -= self.cosinus_speed_z
-        if not self.cosinus_upward:
-            self.cosinus_z_number += self.cosinus_speed_z
-
+        x_p = 100
+        y_p = 200
+        r = 100
+        
         # Checks if the arm should have reached the end of the movement, if so change direction
         if self.cosinus_x_number > self.cosinus_x_start_end[1]:
             self.cosinus_forward = False
@@ -366,11 +362,32 @@ class TeleopNode:
         if self.cosinus_x_number < self.cosinus_x_start_end[0]:
             self.cosinus_forward = True
 
-        if self.cosinus_z_number > self.cosinus_z_start_end[1]:
-            self.cosinus_upward = True
+        # Checks if the arm should move forward or backward
+        if self.cosinus_forward:
+            self.cosinus_x_number += self.cosinus_speed_x
+        """
+        if self.cosinus_x_number >= x_p:
+                self.cosinus_x_number += 0.2 + (1 - (self.cosinus_x_number - self.cosinus_x_start_end[1]))/self.cosinus_x_start_end[1]
+        if self.cosinus_x_number < x_p:
+        self.cosinus_x_number += 0.2 + (1 - (self.cosinus_x_start_end[0] - self.cosinus_x_number))/self.cosinus_x_start_end[1]
+        """
 
-        if self.cosinus_z_number < self.cosinus_z_start_end[0]:
-            self.cosinus_upward = False
+        if not self.cosinus_forward:
+            self.cosinus_x_number -= self.cosinus_speed_x
+        """
+        if self.cosinus_x_number >= x_p:
+                self.cosinus_x_number -= 0.2 + (1 - (self.cosinus_x_number - self.cosinus_x_start_end[1]))/self.cosinus_x_start_end[1]
+        if self.cosinus_x_number < x_p:
+        self.cosinus_x_number -= 0.2 + (1 - (self.cosinus_x_start_end[0] - self.cosinus_x_number))/self.cosinus_x_start_end[1]
+        """
+        x_norm = float(self.cosinus_x_number)/float(self.cosinus_x_start_end[1])*np.pi*2
+
+        # Checks if the arm should move upward or downward
+        if self.cosinus_forward:
+            self.cosinus_z_number = 200 + 80 * np.sin(x_norm)
+        if not self.cosinus_forward:
+            self.cosinus_z_number = 200 - 80 * np.sin(x_norm)
+	
 
         pos[0] = self.cosinus_x_number
         pos[1] = self.cosinus_y
@@ -379,6 +396,7 @@ class TeleopNode:
 
     # Function for controlling the end effector
     def end_effector(self, angle, mirror=False, left=False):
+
         # Puts the end effector to home position
         if self.evaluate_button(self.home_button):
             angle[0] = 90
@@ -426,6 +444,51 @@ class TeleopNode:
 
         # Returns the updated variables so it can be stored
         return angle
+    
+    def move_end_effector(self, left=0):
+        for i in self.endeff_movement:
+            # Arm 1
+            if left == 0:
+                # Publishes the position to the arm
+                self.end_effector1_angles[0] = i[0]
+                self.end_effector1_angles[1] = i[1]
+
+                array1 = Int32MultiArray()
+                array1.data = self.end_effector1_angles
+                self.end_effector_pub1.publish(array1)
+
+            # Arm 2
+            if left == 1:
+                # Publishes the position to the arm
+                self.end_effector2_angles[0] = i[0]
+                self.end_effector2_angles[1] = i[1]
+
+                array2 = Int32MultiArray()
+                array2.data = self.end_effector2_angles
+                self.end_effector_pub2.publish(array2)
+
+            # Both arms
+            if left == 2:
+                # Publishes the position to the arms
+                self.end_effector1_angles[0] = i[0]
+                self.end_effector1_angles[1] = i[1]
+
+                self.end_effector2_angles[0] = i[0]
+                self.end_effector2_angles[1] = i[1]
+
+                array1 = Int32MultiArray()
+                array1.data = self.end_effector1_angles
+                self.end_effector_pub1.publish(array1)
+
+                array2 = Int32MultiArray()
+                array2.data = self.end_effector2_angles
+                self.end_effector_pub2.publish(array2)
+
+            sleep(3)
+
+        # Prints when the arm has reached the desired position
+        rospy.loginfo('Done moving')
+        self.active_end_effector_move = False
 
     # Callback function for the "joy" topic to control hz
     def joy_callback(self, data):
@@ -477,7 +540,7 @@ class TeleopNode:
                     rospy.loginfo('Mirror ' + ('enabled' if self.mirror else 'disabled'))
 
                 if self.evaluate_button(self.away_button):
-                    self.away_statement = (self.away_statement + 1) % 6
+                    self.away_statement = (self.away_statement + 1) % 7
                     if self.away_statement == 0:
                         rospy.loginfo("Status: Free")
                     elif self.away_statement == 1:
@@ -485,16 +548,19 @@ class TeleopNode:
                     elif self.away_statement == 2:
                         rospy.loginfo("Status: Away")
                     elif self.away_statement == 3:
+                        self.arm_movement = rospy.get_param('/arm_movement')
                         rospy.loginfo("Status: Move preset")
                     elif self.away_statement == 4:
                         rospy.loginfo("Status: Move sinusodial")
                     elif self.away_statement == 5:
                         rospy.loginfo("Status: Move cosinusodial")
+                    elif self.away_statement == 6:
+                        self.endeff_movement = rospy.get_param('/endeff_movement')
+                        rospy.loginfo("Status: Move end_effectors preset")
                     else:
                         rospy.logwarn("Unknown status value: {}".format(self.away_statement))
 
                 if self.evaluate_button(self.end_button):
-                    rospy.loginfo("check")
                     if self.away_statement == 1 and not self.active_sinusodal and \
                             not self.active_cosinusodal:
                         if self.arm1_initiated and self.arm2_initiated:
@@ -538,6 +604,11 @@ class TeleopNode:
                         self.active_cosinusodal = not self.active_cosinusodal
                         rospy.loginfo('Co-sinusoidal ' + (
                             'enabled' if self.active_cosinusodal else 'disabled'))
+                        
+                    elif self.away_statement == 6:
+                        self.active_end_effector_move = not self.active_end_effector_move
+                        rospy.loginfo('Endeffector_pre_move ' + (
+                            'enabled' if self.active_end_effector_move else 'disabled'))
 
                 # Adjust the speed of the arms and end effectors
                 if self.evaluate_button(self.increase_arm_speed):
@@ -576,12 +647,21 @@ class TeleopNode:
                         self.armposition_2 = self.controll_arm(self.armposition_2, self.mirror,
                                                                left=True)
 
-                    if self.endeffector1_initiated:
+                    if self.endeffector1_initiated and not self.active_end_effector_move:
                         self.end_effector1_angles = self.end_effector(self.end_effector1_angles)
 
-                    if self.endeffector2_initiated:
+                    if self.endeffector2_initiated and not self.active_end_effector_move:
                         self.end_effector2_angles = self.end_effector(self.end_effector2_angles,
                                                                       self.mirror, left=True)
+                        
+                    if self.endeffector1_initiated and self.endeffector2_initiated and self.active_end_effector_move:
+                        self.move_end_effector(left=2)
+
+                    elif self.endeffector1_initiated and self.active_end_effector_move:
+                        self.move_end_effector()
+
+                    elif self.endeffector2_initiated and self.active_end_effector_move:
+                        self.move_end_effector(left=1)
 
                     if self.arm1_initiated and self.active_sinusodal and not self.active_cosinusodal:
                         self.armposition_1 = self.move_arm_sinusodial(self.armposition_1)
@@ -643,4 +723,10 @@ Can co both sinus and cosine at same time. remove.
 End effector error if moved to fast
 Safety always working?
 Calibration at the same time, error
+
+
+Add en_effector pre move to 9 places, wait 5secunds in each place.
+
+
+Change arm1_calib_strech, endeffector
 """
