@@ -4,7 +4,7 @@
   <!-- rostopic pub /arm2_calib_cmd std_msgs/Bool "data: false"-->
 
   <!--Param for the joy node-->
-  <arg name="joy_dev" default="/dev/input/js0" />
+  <arg name="joy_dev" default="/dev/input/js1" />
   <arg name="joy_deadzone" default="0.05" />
   <arg name="joy_autorepeat_rate" default="20" />
 
