@@ -1,7 +1,7 @@
 <launch>
 
-  <!-- rostopic pub /arm1_calib_stretched_cmd std_msgs/Bool "data: false"-->
-  <!-- rostopic pub /arm2_calib_stretched_cmd std_msgs/Bool "data: false"-->
+  <!-- rostopic pub /arm1_calib_cmd std_msgs/Bool "data: false"-->
+  <!-- rostopic pub /arm2_calib_cmd std_msgs/Bool "data: false"-->
 
   <!--Param for the joy node-->
   <arg name="joy_dev" default="/dev/input/js0" />
