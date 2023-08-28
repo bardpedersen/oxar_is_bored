@@ -89,14 +89,23 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   </group>
 
+  <!-- Animate -->
+  <node name="rqt_multiplot" pkg="rqt_multiplot" type="rqt_multiplot" output="screen" 
+        args="--multiplot-config $(find oxar_is_bored)/rviz/rqt_multiplot_arm.xml" />
+  <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" />
+  <node name="target_publisher" pkg="oxar_is_bored" type="target_publisher.py" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_urdf.rviz" />
+  
+  
   <!-- Publish trajectory markers -->
   <node name="trajectory_1_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="base_link arm1_pan_link arm1_trajectory [0,0,1,0.8] 0 0.005 20"/>
+  args="arm1_base_link arm1_pan_link arm1_trajectory [0,0,1,0.8] 0 0.005 10"/>
   <node name="reference_1_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="arm1_base_link arm1_reference_link arm1_reference [1,0,1,0.8] 0 0.005 20"/>
+  args="arm1_base_link arm1_reference_link arm1_reference [1,0,1,0.8] 0 0.005 10"/>
 
   <!-- <node name="trajectory_2_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
   args="base_link arm2_end_effector_link arm2_trajectory [1,0,0,0.8] 0 0.01 20"/> -->
+<<<<<<< HEAD
   
   
   <!-- Animate -->
@@ -108,5 +117,7 @@
   <node name="target_publisher" pkg="oxar_is_bored" type="target_publisher.py" />
 >>>>>>> b10cc71... test
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_urdf.rviz" />
+=======
+>>>>>>> e4c01af... rqt_multiplot
 
 </launch>

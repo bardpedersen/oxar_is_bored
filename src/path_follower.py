@@ -36,7 +36,9 @@ class Path_follower:
             return False
         
     def move_arm(self, left=0, path=None):
-        if path != None:
+        if path == None:
+            self.path = rospy.get_param('arm_movement')
+        else:
             self.path = path
 
         # Checks one position at a time from list
@@ -78,4 +80,6 @@ class Path_follower:
 if __name__ == '__main__':
     follower = Path_follower()
     sleep(1)
-    follower.move_arm(0)
+    while True:
+        follower.move_arm(0)
+        sleep(5)
