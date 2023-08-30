@@ -18,7 +18,7 @@ def create_path(t_step=0.1, duration=20, freq=0.1, freq_shift=1, phase_shift=np.
     phi_z = phase_shift
 
     x_coords = []; y_coords = []; z_coords = []; t_coords = []
-    for t in np.arange(0, duration, t_step):
+    for t in np.arange(0, duration, t_step) + t_step:
         x = np.sin(omega_x*t + phi_x) * amplitude + center_x
         y = np.sin(omega_y*t + phi_y) * amplitude + center_y
         z = np.cos(omega_z*t + phi_z) * amplitude + center_z
@@ -32,7 +32,7 @@ def create_step(t_step=1, duration=20, step_x=50, step_y=0, step_z=0):
     pose_x = True; pose_y = True; pose_z = True
 
     x_coords = []; y_coords = []; z_coords = []; t_coords = []
-    for t in np.arange(0, duration, t_step):
+    for t in np.arange(0, duration, t_step) + t_step:
         if pose_x and pose_z:
             pose_x = not pose_x
         elif not pose_x and pose_z:

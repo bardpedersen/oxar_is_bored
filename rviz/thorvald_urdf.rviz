@@ -98,10 +98,19 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.5
-    Tree Height: 315
+    Tree Height: 441
+  - Class: rviz/Displays
+    Help Height: 0
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Image2
+        - /TF1/Frames1/arm2_pan_link1
+        - /TF1/Frames1/arm2_reference_link1
+      Splitter Ratio: 0.5
+    Tree Height: 140
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -215,7 +224,7 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
-      Enabled: false
+      Enabled: true
       Links:
         All Links Enabled: true
         Expand Joint Details: false
@@ -223,12 +232,18 @@ Visualization Manager:
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0519a35... Two arms with markers and plots
         arm2_base_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
         arm2_end_effector_link:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0519a35... Two arms with markers and plots
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -238,6 +253,7 @@ Visualization Manager:
           Show Trail: false
           Value: true
         arm2_offset_link:
+<<<<<<< HEAD
 =======
           Alpha: 1
           Show Axes: false
@@ -253,10 +269,13 @@ Visualization Manager:
 =======
         arm2_offset_link:
 >>>>>>> b10cc71... test
+=======
+>>>>>>> 0519a35... Two arms with markers and plots
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+<<<<<<< HEAD
 <<<<<<< HEAD
         arm2_prismatic_link:
           Alpha: 1
@@ -266,19 +285,28 @@ Visualization Manager:
 =======
         arm2_pan_link:
 >>>>>>> b10cc71... test
+=======
+        arm2_pan_link:
+>>>>>>> 0519a35... Two arms with markers and plots
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+<<<<<<< HEAD
 <<<<<<< HEAD
         arm2_tilt_link:
 =======
+=======
+>>>>>>> 0519a35... Two arms with markers and plots
         arm2_prismatic_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
         arm2_shoulder_link:
+<<<<<<< HEAD
 >>>>>>> b10cc71... test
+=======
+>>>>>>> 0519a35... Two arms with markers and plots
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -292,13 +320,16 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+<<<<<<< HEAD
 =======
 >>>>>>> 92dd69d... Circle path
+=======
+>>>>>>> 0519a35... Two arms with markers and plots
       Name: RobotModel
       Robot Description: arm_2/robot_description
       TF Prefix: ""
       Update Interval: 0
-      Value: false
+      Value: true
       Visual Enabled: true
     - Alpha: 1
       Class: rviz/RobotModel
@@ -1042,11 +1073,58 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+<<<<<<< HEAD
 =======
 >>>>>>> 92dd69d... Circle path
+=======
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /arm1_trajectory
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 10
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /arm1_reference
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 10
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /arm2_trajectory
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 10
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /arm2_reference
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 10
+      Value: true
+>>>>>>> 0519a35... Two arms with markers and plots
+    - Class: rviz/Image
+      Enabled: false
+      Image Topic: /usb_cam_0/image_raw
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: compressed
+      Unreliable: false
+      Value: false
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /camera_l2/color/image_raw
+      Image Topic: /usb_cam_0/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -1066,7 +1144,7 @@ Visualization Manager:
         arc:
           Value: false
         arm1_base_link:
-          Value: true
+          Value: false
         arm1_end_effector_link:
           Value: false
         arm1_forearm_link:
@@ -1077,6 +1155,8 @@ Visualization Manager:
           Value: true
         arm1_prismatic_link:
           Value: false
+        arm1_reference_link:
+          Value: true
         arm1_shoulder_link:
           Value: false
         arm1_tilt_link:
@@ -1090,9 +1170,11 @@ Visualization Manager:
         arm2_offset_link:
           Value: false
         arm2_pan_link:
-          Value: false
+          Value: true
         arm2_prismatic_link:
           Value: false
+        arm2_reference_link:
+          Value: true
         arm2_shoulder_link:
           Value: false
         arm2_tilt_link:
@@ -1158,24 +1240,6 @@ Visualization Manager:
         calibration_2a_base_link:
           Value: false
         calibration_2b_base_link:
-          Value: false
-        camera_l1_color_frame:
-          Value: false
-        camera_l1_color_optical_frame:
-          Value: false
-        camera_l1_depth_frame:
-          Value: false
-        camera_l1_depth_optical_frame:
-          Value: false
-        camera_l1_infra1_frame:
-          Value: false
-        camera_l1_infra1_optical_frame:
-          Value: false
-        camera_l1_infra2_frame:
-          Value: false
-        camera_l1_infra2_optical_frame:
-          Value: false
-        camera_l1_link:
           Value: false
         camera_l2_color_frame:
           Value: false
@@ -1302,6 +1366,8 @@ Visualization Manager:
                       arm1_tilt_link:
                         arm1_end_effector_link:
                           {}
+            arm1_reference_link:
+              {}
           arm2_base_link:
             arm2_prismatic_link:
               arm2_shoulder_link:
@@ -1311,6 +1377,8 @@ Visualization Manager:
                       arm2_tilt_link:
                         arm2_end_effector_link:
                           {}
+            arm2_reference_link:
+              {}
           bat0:
             {}
           bat1:
@@ -1431,19 +1499,6 @@ Visualization Manager:
             {}
           top3:
             {}
-        camera_l1_link:
-          camera_l1_color_frame:
-            camera_l1_color_optical_frame:
-              {}
-          camera_l1_depth_frame:
-            camera_l1_depth_optical_frame:
-              {}
-          camera_l1_infra1_frame:
-            camera_l1_infra1_optical_frame:
-              {}
-          camera_l1_infra2_frame:
-            camera_l1_infra2_optical_frame:
-              {}
         camera_l2_link:
           camera_l2_color_frame:
             camera_l2_color_optical_frame:
@@ -1522,6 +1577,7 @@ Visualization Manager:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       Distance: 3.5254786014556885
 =======
       Distance: 4.894093036651611
@@ -1547,6 +1603,9 @@ Visualization Manager:
 =======
       Distance: 0.9026646614074707
 >>>>>>> 92dd69d... Circle path
+=======
+      Distance: 1.5797804594039917
+>>>>>>> 0519a35... Two arms with markers and plots
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1554,6 +1613,7 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1575,11 +1635,17 @@ Visualization Manager:
         Y: 0.2844398617744446
         Z: 1.1728202104568481
 >>>>>>> 92dd69d... Circle path
+=======
+        X: 0.023030541837215424
+        Y: 0.09971711039543152
+        Z: 1.1510708332061768
+>>>>>>> 0519a35... Two arms with markers and plots
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1637,6 +1703,11 @@ Visualization Manager:
       Target Frame: <Fixed Frame>
       Yaw: 4.640414714813232
 >>>>>>> e4c01af... rqt_multiplot
+=======
+      Pitch: 0.7197968363761902
+      Target Frame: <Fixed Frame>
+      Yaw: 0.8853971362113953
+>>>>>>> 0519a35... Two arms with markers and plots
     Saved: ~
 Window Geometry:
   Displays:
@@ -1697,6 +1768,7 @@ Window Geometry:
     collapsed: false
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   QMainWindow State: 000000ff00000000fd00000004000000000000036200000375fc020000000cfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000003d000000c90000000000000000fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065010000003d000003750000001600fffffffb000000100044006900730070006c0061007900730000000187000000f8000000c900fffffffb000000100044006900730070006c006100790073000000028e00000124000000c900fffffffb000000100044006900730070006c006100790073000000028e00000124000000c900ffffff000000010000010f00000316fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d00000316000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d0065010000000000000780000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000004180000037500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
 >>>>>>> b10cc71... test
 =======
@@ -1705,6 +1777,9 @@ Window Geometry:
 =======
   QMainWindow State: 000000ff00000000fd00000004000000000000036200000375fc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000003d000000c9000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065010000003d000001f70000001600fffffffb000000100044006900730070006c0061007900730000000187000000f8000000c900fffffffb000000100044006900730070006c006100790073000000028e00000124000000c900fffffffb000000100044006900730070006c006100790073000000028e00000124000000c900fffffffb000000100044006900730070006c00610079007300000002e9000000c9000000c900fffffffb000000100044006900730070006c006100790073010000023a00000178000000c900fffffffb000000100044006900730070006c006100790073010000028e000001240000000000000000000000010000010f00000316fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d00000316000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d0065010000000000000780000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000004180000037500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
 >>>>>>> e4c01af... rqt_multiplot
+=======
+  QMainWindow State: 000000ff00000000fd00000004000000000000036200000375fc0200000011fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000003d000000c9000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d006100670065010000003d000003750000001600fffffffb000000100044006900730070006c0061007900730000000187000000f8000000c900fffffffb000000100044006900730070006c006100790073000000028e00000124000000c900fffffffb000000100044006900730070006c006100790073000000028e00000124000000c900fffffffb000000100044006900730070006c00610079007300000002e9000000c9000000c900fffffffb000000100044006900730070006c00610079007300000002570000015b000000c900fffffffb000000100044006900730070006c00610079007300000002e9000000c9000000c900fffffffb000000100044006900730070006c00610079007301000002d7000000db0000000000000000fb0000000a0049006d00610067006500000002ea000000c80000001600ffffff000000010000010f00000316fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d00000316000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d0065010000000000000780000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000004180000037500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+>>>>>>> 0519a35... Two arms with markers and plots
   Selection:
     collapsed: false
   Time:
@@ -1734,6 +1809,7 @@ Window Geometry:
   Width: 1920
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   X: 0
 >>>>>>> 85c542f... Target reference
   Y: 27
@@ -1744,5 +1820,8 @@ Window Geometry:
 >>>>>>> db4253f... Correct position of marker
 =======
   X: 1920
+=======
+  X: 0
+>>>>>>> 0519a35... Two arms with markers and plots
   Y: 0
 >>>>>>> 0a74866... Add markers to end effector

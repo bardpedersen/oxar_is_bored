@@ -23,16 +23,15 @@ class TFToJointStatePublisher:
 
             self.joint_state_pub.publish(joint_state_msg)
 
-        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-            rospy.logwarn("TF lookup failed for {}".format(self.tf_link_name))
+        except:
+            pass
 
 
-def jointState_to_tf(data):
+def arm1position_publisher(data):
     x = data.position[0]/1000 - abs(0.15011 - 0.10123)
     y = data.position[1]/1000 - abs(0.35032 - 0.3585)
     z = -data.position[2]/1000 + abs(1.006280 - 1.2543)
 
-    # Create a TransformStamped message
     broadcaster.sendTransform(
         (x, y, z),
         (0.0, 0.0, 0.0, 1.0),
@@ -41,17 +40,38 @@ def jointState_to_tf(data):
         'arm1_base_link'
     )
 
+def arm2position_publisher(data):
+    x = data.position[0]/1000 + abs(0.13749 - 0.11897)
+    y = data.position[1]/1000 - abs(0.35032 - 0.3585)
+    z = -data.position[2]/1000 + abs(1.006280 - 1.2543)
+
+    broadcaster.sendTransform(
+        (x, y, z),
+        (0.0, 0.0, 0.0, 1.0),
+        rospy.Time.now(),
+        'arm2_reference_link',
+        'arm2_base_link'
+    )
+
 
 # Launch node
 rospy.init_node('target_publisher')
-broadcaster = tf.TransformBroadcaster()
-arm1_subscriber = rospy.Subscriber('arm1position', JointState, jointState_to_tf)
 
+# Publish reference
+broadcaster = tf.TransformBroadcaster()
+arm1_subscriber = rospy.Subscriber('arm1position', JointState, arm1position_publisher)
+arm1_subscriber = rospy.Subscriber('arm2position', JointState, arm2position_publisher)
+
+# Publish TF as topics
 arm1_reference_link = TFToJointStatePublisher('arm1_reference_link', tf_link_parent='arm1_base_link')
 arm1_pan_link = TFToJointStatePublisher('arm1_pan_link', tf_link_parent='arm1_base_link')
+arm2_reference_link = TFToJointStatePublisher('arm2_reference_link', tf_link_parent='arm2_base_link')
+arm2_pan_link = TFToJointStatePublisher('arm2_pan_link', tf_link_parent='arm2_base_link')
 
 while not rospy.is_shutdown():
     arm1_reference_link.publish_joint_state()
     arm1_pan_link.publish_joint_state()
+    arm2_reference_link.publish_joint_state()
+    arm2_pan_link.publish_joint_state()
 
 rospy.spin()
