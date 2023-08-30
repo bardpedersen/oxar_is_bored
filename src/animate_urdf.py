@@ -4,6 +4,7 @@ import numpy as np
 import rospy
 from std_msgs.msg import Int32MultiArray, Float32MultiArray
 from sensor_msgs.msg import JointState
+from geometry_msgs.msg import PoseArray
 
 
 class ArmToJointState:
@@ -27,7 +28,7 @@ class ArmToJointState:
         # Subscribe to topics and update joint positions
         rospy.Subscriber(f'arm{arm_number}_angle', Float32MultiArray, self.arm_callback)
         rospy.Subscriber(f'endeffector{arm_number}', Int32MultiArray, self.end_callback)
-        rospy.Subscriber(f'arm{arm_number}position', JointState, self.z_callback)
+        rospy.Subscriber(f'arm{arm_number}_cur_pos', PoseArray, self.z_callback)
 
     def arm_callback(self, msg):
         # Update the corresponding joint position
@@ -40,12 +41,11 @@ class ArmToJointState:
         self.joint_state.position[5] = np.radians(msg.data[-2]-90)
 
     def z_callback(self, msg):
-        z = -msg.position[-1] / 1000
+        z = -msg.poses[0].position.z / 1000
         self.joint_state.position[0] = z 
 
 
     def publish_joint_state(self):
-        rospy.loginfo(self.joint_state)
         # Publish the joint state
         self.joint_state.header.stamp = rospy.Time.now()
         self.joint_state_pub.publish(self.joint_state)

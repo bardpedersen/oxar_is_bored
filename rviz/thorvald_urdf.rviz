@@ -97,7 +97,9 @@ Panels:
     Help Height: 0
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 315
 Preferences:
@@ -781,11 +783,15 @@ Visualization Manager:
       Marker Topic: /arm1_reference
       Name: Marker
       Namespaces:
+<<<<<<< HEAD
         "": true
 <<<<<<< HEAD
 <<<<<<< HEAD
       Queue Size: 200
 =======
+=======
+        {}
+>>>>>>> 69c8b4d... Bug fixes
       Queue Size: 10
 >>>>>>> e4c01af... rqt_multiplot
       Value: true
@@ -1051,12 +1057,232 @@ Visualization Manager:
       Unreliable: false
       Value: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Filter (blacklist): ""
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        arc:
+          Value: false
+        arm1_base_link:
+          Value: true
+        arm1_end_effector_link:
+          Value: false
+        arm1_forearm_link:
+          Value: false
+        arm1_offset_link:
+          Value: false
+        arm1_pan_link:
+          Value: true
+        arm1_prismatic_link:
+          Value: false
+        arm1_shoulder_link:
+          Value: false
+        arm1_tilt_link:
+          Value: false
+        arm2_base_link:
+          Value: false
+        arm2_end_effector_link:
+          Value: false
+        arm2_forearm_link:
+          Value: false
+        arm2_offset_link:
+          Value: false
+        arm2_pan_link:
+          Value: false
+        arm2_prismatic_link:
+          Value: false
+        arm2_shoulder_link:
+          Value: false
+        arm2_tilt_link:
+          Value: false
+        aruco_901:
+          Value: false
+        aruco_902:
+          Value: false
+        aruco_903:
+          Value: false
+        aruco_904:
+          Value: false
+        aruco_905:
+          Value: false
+        aruco_906:
+          Value: false
+        aruco_907:
+          Value: false
+        aruco_908:
+          Value: false
+        aruco_909:
+          Value: false
+        aruco_910:
+          Value: false
+        aruco_911:
+          Value: false
+        aruco_912:
+          Value: false
+        aruco_913:
+          Value: false
+        aruco_914:
+          Value: false
+        aruco_915:
+          Value: false
+        aruco_916:
+          Value: false
+        aruco_917:
+          Value: false
+        aruco_918:
+          Value: false
+        aruco_919:
+          Value: false
+        aruco_920:
+          Value: false
+        aruco_921:
+          Value: false
+        aruco_922:
+          Value: false
+        aruco_923:
+          Value: false
+        aruco_924:
+          Value: false
+        base_link:
+          Value: false
+        bat0:
+          Value: false
+        bat1:
+          Value: false
+        calibration_1a_base_link:
+          Value: false
+        calibration_1b_base_link:
+          Value: false
+        calibration_2a_base_link:
+          Value: false
+        calibration_2b_base_link:
+          Value: false
+        camera_l1_color_frame:
+          Value: false
+        camera_l1_color_optical_frame:
+          Value: false
+        camera_l1_depth_frame:
+          Value: false
+        camera_l1_depth_optical_frame:
+          Value: false
+        camera_l1_infra1_frame:
+          Value: false
+        camera_l1_infra1_optical_frame:
+          Value: false
+        camera_l1_infra2_frame:
+          Value: false
+        camera_l1_infra2_optical_frame:
+          Value: false
+        camera_l1_link:
+          Value: false
+        camera_l2_color_frame:
+          Value: false
+        camera_l2_color_optical_frame:
+          Value: false
+        camera_l2_depth_frame:
+          Value: false
+        camera_l2_depth_optical_frame:
+          Value: false
+        camera_l2_infra1_frame:
+          Value: false
+        camera_l2_infra1_optical_frame:
+          Value: false
+        camera_l2_link:
+          Value: false
+        camera_r1_color_frame:
+          Value: false
+        camera_r1_color_optical_frame:
+          Value: false
+        camera_r1_depth_frame:
+          Value: false
+        camera_r1_depth_optical_frame:
+          Value: false
+        camera_r1_link:
+          Value: false
+        camera_r2_color_frame:
+          Value: false
+        camera_r2_color_optical_frame:
+          Value: false
+        camera_r2_depth_frame:
+          Value: false
+        camera_r2_depth_optical_frame:
+          Value: false
+        camera_r2_link:
+          Value: false
+        corner0:
+          Value: false
+        corner0_1:
+          Value: false
+        corner0_2:
+          Value: false
+        corner0_3:
+          Value: false
+        corner0_4:
+          Value: false
+        corner1:
+          Value: false
+        corner1_1:
+          Value: false
+        corner1_2:
+          Value: false
+        corner1_3:
+          Value: false
+        corner1_4:
+          Value: false
+        corner2:
+          Value: false
+        corner2_1:
+          Value: false
+        corner2_2:
+          Value: false
+        corner2_3:
+          Value: false
+        corner2_4:
+          Value: false
+        corner3:
+          Value: false
+        corner3_1:
+          Value: false
+        corner3_2:
+          Value: false
+        corner3_3:
+          Value: false
+        corner3_4:
+          Value: false
+        leg0:
+          Value: false
+        leg1:
+          Value: false
+        leg2:
+          Value: false
+        leg3:
+          Value: false
+        pipe0_1:
+          Value: false
+        pipe0_2:
+          Value: false
+        pipe2_1:
+          Value: false
+        pipe2_2:
+          Value: false
+        top0:
+          Value: false
+        top1:
+          Value: false
+        top2:
+          Value: false
+        top3:
+          Value: false
+        wheel0_link:
+          Value: false
+        wheel1_link:
+          Value: false
+        wheel2_link:
+          Value: false
+        wheel3_link:
+          Value: false
       Marker Alpha: 1
       Marker Scale: 0.20000000298023224
       Name: TF
@@ -1064,8 +1290,186 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        {}
+        base_link:
+          arc:
+            {}
+          arm1_base_link:
+            arm1_prismatic_link:
+              arm1_shoulder_link:
+                arm1_forearm_link:
+                  arm1_offset_link:
+                    arm1_pan_link:
+                      arm1_tilt_link:
+                        arm1_end_effector_link:
+                          {}
+          arm2_base_link:
+            arm2_prismatic_link:
+              arm2_shoulder_link:
+                arm2_forearm_link:
+                  arm2_offset_link:
+                    arm2_pan_link:
+                      arm2_tilt_link:
+                        arm2_end_effector_link:
+                          {}
+          bat0:
+            {}
+          bat1:
+            {}
+          calibration_1a_base_link:
+            aruco_901:
+              {}
+            aruco_902:
+              {}
+            aruco_903:
+              {}
+            aruco_904:
+              {}
+            aruco_905:
+              {}
+            aruco_906:
+              {}
+          calibration_1b_base_link:
+            aruco_907:
+              {}
+            aruco_908:
+              {}
+            aruco_909:
+              {}
+            aruco_910:
+              {}
+            aruco_911:
+              {}
+            aruco_912:
+              {}
+          calibration_2a_base_link:
+            aruco_913:
+              {}
+            aruco_914:
+              {}
+            aruco_915:
+              {}
+            aruco_916:
+              {}
+            aruco_917:
+              {}
+            aruco_918:
+              {}
+          calibration_2b_base_link:
+            aruco_919:
+              {}
+            aruco_920:
+              {}
+            aruco_921:
+              {}
+            aruco_922:
+              {}
+            aruco_923:
+              {}
+            aruco_924:
+              {}
+          corner0:
+            corner0_1:
+              {}
+            corner0_2:
+              {}
+            corner0_3:
+              {}
+            corner0_4:
+              {}
+          corner1:
+            corner1_1:
+              {}
+            corner1_2:
+              {}
+            corner1_3:
+              {}
+            corner1_4:
+              {}
+          corner2:
+            corner2_1:
+              {}
+            corner2_2:
+              {}
+            corner2_3:
+              {}
+            corner2_4:
+              {}
+          corner3:
+            corner3_1:
+              {}
+            corner3_2:
+              {}
+            corner3_3:
+              {}
+            corner3_4:
+              {}
+          leg0:
+            wheel0_link:
+              {}
+          leg1:
+            wheel1_link:
+              {}
+          leg2:
+            wheel2_link:
+              {}
+          leg3:
+            wheel3_link:
+              {}
+          pipe0_1:
+            {}
+          pipe0_2:
+            {}
+          pipe2_1:
+            {}
+          pipe2_2:
+            {}
+          top0:
+            {}
+          top1:
+            {}
+          top2:
+            {}
+          top3:
+            {}
+        camera_l1_link:
+          camera_l1_color_frame:
+            camera_l1_color_optical_frame:
+              {}
+          camera_l1_depth_frame:
+            camera_l1_depth_optical_frame:
+              {}
+          camera_l1_infra1_frame:
+            camera_l1_infra1_optical_frame:
+              {}
+          camera_l1_infra2_frame:
+            camera_l1_infra2_optical_frame:
+              {}
+        camera_l2_link:
+          camera_l2_color_frame:
+            camera_l2_color_optical_frame:
+              {}
+          camera_l2_depth_frame:
+            camera_l2_depth_optical_frame:
+              {}
+          camera_l2_infra1_frame:
+            camera_l2_infra1_optical_frame:
+              {}
+        camera_r1_link:
+          camera_r1_color_frame:
+            camera_r1_color_optical_frame:
+              {}
+          camera_r1_depth_frame:
+            camera_r1_depth_optical_frame:
+              {}
+        camera_r2_link:
+          camera_r2_color_frame:
+            camera_r2_color_optical_frame:
+              {}
+          camera_r2_depth_frame:
+            camera_r2_depth_optical_frame:
+              {}
       Update Interval: 0
+<<<<<<< HEAD
 <<<<<<< HEAD
       Value: true
 >>>>>>> 85c542f... Target reference
@@ -1079,6 +1483,9 @@ Visualization Manager:
 =======
       Value: false
 >>>>>>> b10cc71... test
+=======
+      Value: true
+>>>>>>> 69c8b4d... Bug fixes
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

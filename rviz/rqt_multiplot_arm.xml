@@ -11,13 +11,13 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
+                                <custom_title>Time</custom_title>
+                                <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
+                                <custom_title>Position</custom_title>
+                                <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </y_axis>
                         </axes>
@@ -26,20 +26,20 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field>header/stamp</field>
+                                    <field></field>
                                     <field_type>1</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-50</relative_minimum>
+                                        <relative_minimum>-30</relative_minimum>
                                         <type>2</type>
                                     </scale>
-                                    <topic>/arm1_trajectory</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_pan_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>points/0/x</field>
+                                    <field>position/0</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -48,8 +48,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/arm1_trajectory</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_pan_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -77,20 +77,20 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field>header/seq</field>
+                                    <field>position/0</field>
                                     <field_type>1</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-50</relative_minimum>
+                                        <relative_minimum>-30</relative_minimum>
                                         <type>2</type>
                                     </scale>
-                                    <topic>/arm1_reference</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_reference_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>points/0/x</field>
+                                    <field>position/0</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -99,8 +99,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/arm1_reference</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_reference_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -138,13 +138,13 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
+                                <custom_title>Time</custom_title>
+                                <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
+                                <custom_title>Position</custom_title>
+                                <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </y_axis>
                         </axes>
@@ -153,20 +153,20 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field>header/stamp</field>
+                                    <field>position/1</field>
                                     <field_type>1</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-50</relative_minimum>
+                                        <relative_minimum>-30</relative_minimum>
                                         <type>2</type>
                                     </scale>
-                                    <topic>/arm1_trajectory</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_pan_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>points/0/y</field>
+                                    <field>position/1</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -175,8 +175,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/arm1_trajectory</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_pan_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -204,20 +204,20 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field>header/seq</field>
+                                    <field>position/1</field>
                                     <field_type>1</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-50</relative_minimum>
+                                        <relative_minimum>-30</relative_minimum>
                                         <type>2</type>
                                     </scale>
-                                    <topic>/arm1_reference</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_reference_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>points/0/y</field>
+                                    <field>position/1</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -226,8 +226,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/arm1_reference</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_reference_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -265,13 +265,13 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
+                                <custom_title>Time</custom_title>
+                                <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
+                                <custom_title>Position</custom_title>
+                                <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </y_axis>
                         </axes>
@@ -280,20 +280,20 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field>header/stamp</field>
+                                    <field>position/2</field>
                                     <field_type>1</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-50</relative_minimum>
+                                        <relative_minimum>-30</relative_minimum>
                                         <type>2</type>
                                     </scale>
-                                    <topic>/arm1_trajectory</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_pan_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>points/0/z</field>
+                                    <field>position/2</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -302,8 +302,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/arm1_trajectory</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_pan_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -331,20 +331,20 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field>header/seq</field>
+                                    <field>position/2</field>
                                     <field_type>1</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-50</relative_minimum>
+                                        <relative_minimum>-30</relative_minimum>
                                         <type>2</type>
                                     </scale>
-                                    <topic>/arm1_reference</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_reference_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>points/0/z</field>
+                                    <field>position/2</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
@@ -353,8 +353,8 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/arm1_reference</topic>
-                                    <type>visualization_msgs/Marker</type>
+                                    <topic>/arm1_reference_link</topic>
+                                    <type>sensor_msgs/JointState</type>
                                 </y_axis>
                             </axes>
                             <color>
