@@ -18,5 +18,10 @@
         <remap from="/ultra_sonic_2" to="/ultra_sonic_r2"/>
     </node>
 
+    <!-- Smooth ultrasonic signals -->
+    <node pkg="oxar_is_bored" type="ultrasonic_smooth.py" name="ultrasonic_smooth" />
+    <!-- Play sound based on the distance -->
+    <node pkg="oxar_is_bored" type="ultrasonic_beep.py" name="ultrasonic_beep" />
+
 </launch>
 
