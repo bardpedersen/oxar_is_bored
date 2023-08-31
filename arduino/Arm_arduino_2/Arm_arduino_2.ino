@@ -6,6 +6,7 @@
 #endif
 
 // Include ros libraries, the message type and the servo library
+#include <cstring>
 #include <ros.h>
 #include <std_msgs/Int32MultiArray.h>
 #include <Servo.h>

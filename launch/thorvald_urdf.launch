@@ -18,69 +18,14 @@
   <group ns="arm_1">
     <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/arm_1.xacro'" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-<<<<<<< HEAD
-<<<<<<< HEAD
     <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" /> -->
-=======
-    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
->>>>>>> 0a74866... Add markers to end effector
-=======
-    <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" /> -->
->>>>>>> b10cc71... test
   </group>
 
   <!-- Arm 2 -->
   <group ns="arm_2">
     <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/arm_2.xacro'" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-<<<<<<< HEAD
-<<<<<<< HEAD
     <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" /> -->
-  </group>
-
-<<<<<<< HEAD
-  <!-- publish trajectory markers -->
-  <node name="trajectory_1_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="base_link arm1_end_effector_link arm_1_trajectory [0,0,1,0.8] 0 0.01 20"/>
-
-  <node name="trajectory_2_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="base_link arm2_end_effector_link arm_2_trajectory [1,0,0,0.8] 0 0.01 20"/>
-  
-<<<<<<< HEAD
-=======
-  <!-- Aruco camera calibration -->
-  <group ns="aruco_calibration">
-    <param name="robot_description" command="$(find xacro)/xacro '$(find oxar_is_bored)/urdf/calibration_all.xacro'" />
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-  </group>
-
-<<<<<<< HEAD
->>>>>>> 713346f... xacro arco
-=======
-  <node name="trajectory_3_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="arm1_base_link target_link target_reference [1,0,0,0.8] 0 0.01 20"/>
-=======
-  <!-- Publish trajectory markers -->
-  <node name="trajectory_1_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="base_link arm_1_end_effector_link arm_1_trajectory [0,0,1,0.8] 0 0.01 20"/>
-
-  <node name="trajectory_2_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="base_link arm_2_end_effector_link arm_2_trajectory [1,0,0,0.8] 0 0.01 20"/>
-
-  <!-- Publish exact trajectory-->
-  <node name="trajectory_3_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="base_link arm_2_end_effector_link arm_2_trajectory [1,0,0,0.8] 0 0.01 20"/>
->>>>>>> cdf9dad... pull changes
-  
->>>>>>> a97056a... Create circle
-  <!-- Animate -->
-  <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" />
-  <node name="target_publisher" pkg="oxar_is_bored" type="target_publisher.py" />
-=======
-    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
-=======
-    <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" /> -->
->>>>>>> b10cc71... test
   </group>
 
   <!-- Aruco camera calibration -->
@@ -100,24 +45,6 @@
   <node name="trajectory_1_publisher"   pkg="thorvald_tunnel_localization"    type="publish_trajectory_markers_from_tf.py"
         args="arm1_base_link arm1_pan_link arm1_trajectory [1,0,0,0.8] 0 0.002 30"/>
 
-<<<<<<< HEAD
-  <!-- <node name="trajectory_2_publisher" pkg="thorvald_tunnel_localization" type="publish_trajectory_markers_from_tf.py"
-  args="base_link arm2_end_effector_link arm2_trajectory [1,0,0,0.8] 0 0.01 20"/> -->
-<<<<<<< HEAD
-  
-  
-  <!-- Animate -->
-<<<<<<< HEAD
-  <!-- <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" /> -->
->>>>>>> 0a74866... Add markers to end effector
-=======
-  <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" />
-  <node name="target_publisher" pkg="oxar_is_bored" type="target_publisher.py" />
->>>>>>> b10cc71... test
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_urdf.rviz" />
-=======
->>>>>>> e4c01af... rqt_multiplot
-=======
   <node name="reference_1_publisher"    pkg="thorvald_tunnel_localization"    type="publish_trajectory_markers_from_tf.py"
         args="arm1_base_link arm1_reference_link arm1_reference [0,1,0,0.8] 0 0.002 30"/>
 
@@ -126,6 +53,5 @@
 
   <node name="reference_2_publisher"    pkg="thorvald_tunnel_localization"    type="publish_trajectory_markers_from_tf.py"
         args="arm2_base_link arm2_reference_link arm2_reference [0,1,0,0.8] 0 0.002 30"/>
->>>>>>> 0519a35... Two arms with markers and plots
 
 </launch>
