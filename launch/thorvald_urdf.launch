@@ -92,7 +92,7 @@
   <!-- Animate -->
   <node name="rqt_multiplot" pkg="rqt_multiplot" type="rqt_multiplot" output="screen" args="--multiplot-config $(find oxar_is_bored)/rviz/rqt_multiplot_arm.xml" />
   <node name="animate_urdf" pkg="oxar_is_bored" type="animate_urdf.py" />
-  <node name="target_publisher" pkg="oxar_is_bored" type="target_publisher.py" />
+  <node name="reference_publisher" pkg="oxar_is_bored" type="reference_publisher.py" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find oxar_is_bored)/rviz/thorvald_urdf.rviz" />
   
   
@@ -122,7 +122,7 @@
         args="arm1_base_link arm1_reference_link arm1_reference [0,1,0,0.8] 0 0.002 30"/>
 
   <node name="trajectory_2_publisher"   pkg="thorvald_tunnel_localization"    type="publish_trajectory_markers_from_tf.py"
-        args="arm2_base_link arm2_pan_link arm2_trajectory [0,0,1,0.8] 0 0.002 30"/>
+        args="arm2_base_link arm2_pan_link arm2_trajectory [0,1,1,0.8] 0 0.002 30"/>
 
   <node name="reference_2_publisher"    pkg="thorvald_tunnel_localization"    type="publish_trajectory_markers_from_tf.py"
         args="arm2_base_link arm2_reference_link arm2_reference [0,1,0,0.8] 0 0.002 30"/>
